@@ -107,7 +107,14 @@ form {
   left: 1em;
   z-index: 100;
   padding: 1em 1em 0 1em;
-  max-width: 300px;
+  width: 330px;
+}
+#loader {
+  width: 20px;
+  float: right;
+  position: relative;
+  top: 1px;
+  margin-right: 1em;
 }
 #button-box {
   position: relative;

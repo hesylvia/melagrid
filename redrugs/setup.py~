@@ -32,17 +32,13 @@ testpkgs=['WebTest >= 1.2.3',
 install_requires=[
     "TurboGears2 >= 2.2.2",
     "Genshi",
-#    "zope.sqlalchemy >= 0.4",
+    "zope.sqlalchemy >= 0.4",
     "repoze.tm2 >= 1.0a5",
-#    "sqlalchemy<0.8b1",
-#    "sqlalchemy-migrate",
-#    "pylons",
-#    "webhelpers",
-#    "gearbox",
-#    "Werkzeug",
+    "sqlalchemy<0.8b1",
+    "sqlalchemy-migrate",
     "tw2.forms",
     "rdflib",
-
+    "rdflib-jsonld",
     "sadi",
     ]
 
@@ -77,7 +73,7 @@ setup(
     """,
     dependency_links=[
         "http://tg.gy/222",
-
+        'git+https://github.com/RDFLib/rdflib-jsonld.git@master#egg=rdflib-jsonld-0.2-dev',
         ],
     zip_safe=False
 )

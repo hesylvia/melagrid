@@ -31,7 +31,6 @@
         <div>
           <input class="searchBox" data-ng-model="searchTerms" type="text" data-provide="typeahead" autocomplete="off"/>
           <input class="btn" type="submit" value="Search" />
-          <img width="20" data-ng-show="loading" src="../img/loader.gif"/>
         </div>
       </form>
       <i class="help fa fa-info-circle fa-lg"></i>
@@ -49,6 +48,7 @@
           <div>
             <input class="searchBox" data-ng-model="searchTerms" type="text" data-provide="typeahead" autocomplete="off"/>
             <input class="btn" type="submit" value="Search" />
+            <img id="loader" data-ng-show="loading" src="../img/loader.gif"/>
           </div>
         </form>
         <div id="btns">
@@ -92,7 +92,7 @@
             <input type="radio" class="radio" name="optCose" id="optCose" value="cose" data-ng-model="layout.name"/> Cose
           </div>
           <div class="half-col">
-            <input type="radio" class="radio" name="optBF" id="optBF" value="breathfirst" data-ng-model="layout.name"/> Breath First
+            <input type="radio" class="radio" name="optBF" id="optBF" value="breadthfirst" data-ng-model="layout.name"/> Breadth First
             <input type="radio" class="radio" name="optRandom" id="optRandom" value="random" data-ng-model="layout.name"/> Random
           </div>
         </form>

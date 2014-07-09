@@ -251,9 +251,9 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         console.log(entity[$scope.ns.rdf('title')]);
     }
     $scope.addToGraph = function(query) {
+        $scope.loading = true;
         $('#starting-box').css("display", "none");
         $('#interface').removeClass("hidden");
-        $scope.loading = true;
         // console.log(query);
         var g = new $.Graph();
         $scope.createResource($scope.searchTermURIs[$.trim(query)],g);
@@ -411,10 +411,12 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                 elements.push(edge);
             });
         $scope.cy.add(elements);
-        console.log("Elements from appendToGraph " + JSON.stringify(elements));
         $scope.cy.layout($scope.layout);
-        // console.log(elements);
-        $scope.loading = false;
+        // $scope.loading = false;
+        $scope.$apply(function(){
+            $scope.loading = false;
+        });
+        $("#button-box").addClass('hidden');
         $scope.loaded = result.resources.length;
         //$scope.updateDisplay();
     }

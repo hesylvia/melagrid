@@ -90,25 +90,12 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             // console.log(cy.elements());
             cy.elements().unselectify();
             cy.boxSelectionEnabled(false);
-            
-            // cy.elements().qtip({
-            //     content: function(){ return 'Example qTip on ele'; },
-            //     position: {
-            //         my: 'top center',
-            //         at: 'bottom center'
-            //     },
-            //     style: {
-            //         classes: 'qtip-bootstrap',
-            //         tip: {
-            //             width: 16,
-            //             height: 8
-            //         }
-            //     }
-            // });
 
-    
+            cy.on('drag', 'node', function(e) {
+                $("#button-box").addClass('hidden');
+            });
 
-            cy.on('vclick', 'node', function(e){
+            cy.on('select', 'node', function(e){
                 var node = e.cyTarget; 
                 var neighborhood = node.neighborhood().add(node);
                 var pos = node.renderedPosition();

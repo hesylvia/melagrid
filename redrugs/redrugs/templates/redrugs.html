@@ -13,8 +13,6 @@
     <script src="http://bumbu.github.io/cytoscape.js/lib/springy.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.js"></script>
     <script src="../javascript/redrugs.js"></script>
-    <script src="../javascript/cytoscape.js-qtip.js"></script>
-    <script src="../cytoscape.js-cxtmenu.js"></script>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.css" />
 
@@ -66,12 +64,6 @@
         <div class="alert alert-success" data-ng-show="!loading &amp;&amp; loaded != null">Found {{loaded}} connections.</div>
         <div class="alert alert-danger" data-ng-show="!loading &amp;&amp; error">Server Error. Sorry about that, please try again later.</div>
       </div>
-    <!-- 
-      <div id="zoom-box">
-        <div><button id="zoom-in" class="btn btn-small" type="button"><i class="fa fa-th-large"></i></button></div>
-        <div><button id="zoom-out" class="btn btn-small" type="button"><i class="fa fa-th-large"></i></button></div>
-        <div><button id="zoom-fit" class="btn btn-small" type="button"><i class="fa fa-th-large"></i></button></div>
-      </div> -->
 
       <div id="button-box" class="btn-group hidden">
         <button data-ng-click="getUpstream(getSelected())" type="button" class="btn">

@@ -1,10 +1,158 @@
-.footer {
-    margin-top: 45px;
-    padding: 35px 0 36px;
-    border-top: 1px solid #e5e5e5;
+body {
+  font: 14px helvetica neue, helvetica, arial, sans-serif;
+}
+html, body, .container, #page {
+  width: 100%;
+  height: 100%;
+}
+h1 {
+  font-weight: bold;
+  text-align: center;
+  font-size: 32px;
+  padding-top: 0.5em;
+}
+h2 {
+  font-size: 17px;
+  margin: 0;
+  padding-left: 2px;
+}
+h3 {
+  font-size: 14px;
+  padding: 0;
+  margin: 0.5em 0 0.5em 0;
+  border-bottom: 1px solid #CCC;
+}
+ol, ul {
+  list-style: none;
+}
+li {
+  padding-bottom: 0.5em;
+}
+form {
+  margin: 5px 0;
 }
 
-.footer p {
-    margin-bottom: 0;
-    color: #555;
+.hidden {
+  visibility: hidden;
+}
+.searchBox {
+  padding: 0.3em;
+}
+.radio {
+  position: relative;
+  top: -2px;
+}
+.opaque {
+  background-color: rgba(204,204,204,0.5) !important;
+}
+.close {
+  float: right;
+}
+.half-col {
+  float: left;
+  width: 70%;
+}
+
+.centered-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  border-radius: 10px;
+  padding: 1em;
+}
+.centered-box {
+  z-index: 100;
+  text-align: center;
+}
+#centered-box .dropdown-menu {
+  width: 57%;
+}
+.cb-small {
+  height: 200px;
+  width: 350px;
+  margin-top: -120px;
+  margin-left: -175px;
+}
+.cb-large {
+  height: 500px;
+  width: 350px;
+  margin-top: -300px;
+  margin-left: -175px;
+}
+.help {
+  cursor: pointer;
+  position: absolute;
+  padding: 0.5em;
+  bottom: 0.5em;
+  right: 0.5em;
+  text-align: left;
+}
+.help-info {
+  display: none;
+  z-index: 1000;
+  text-align: left;
+}
+.help:hover + .help-info {
+  display: block;
+}
+
+
+#interface {
+  position: absolute;
+  z-index: 1000;
+}
+#search-box {
+  position: fixed;
+  top: 1em;
+  left: 1em;
+  z-index: 100;
+  padding: 1em 1em 0 1em;
+  max-width: 300px;
+}
+#button-box {
+  position: relative;
+}
+#btns {
+  margin: 1em 0 1.5em 0;
+}
+#help-box p, .nodes-legend, .edges-legend {
+  margin-top: 1em;
+}
+
+#legend-box {
+  text-align: left;
+}
+.nodes-legend {
+  height: 110px;
+}
+.edges-legend {
+  height: 250px;
+}
+.nodes-legend, .edges-legend {
+  overflow-y: auto;
+}
+.square, .line {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+.square {
+  width: 10px;
+  height: 10px;
+  background-color: #4679BD;
+}
+.line {
+  display: inline-block;
+  width: 50px;
+  height: 5px;
+  position: relative;
+  top: -1px;
+}
+#type1, #type2, #type3, #type4, #type5, #type6 {
+  background-color: #4679BD;
+}
+
+#results {
+  height: 100%;
+  width: 100%;
+  z-index: 0;
 }

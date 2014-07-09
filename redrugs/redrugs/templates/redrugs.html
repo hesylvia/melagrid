@@ -3,97 +3,119 @@
       xmlns:xi="http://www.w3.org/2001/XInclude">
 
   <xi:include href="master.html" />
-    <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
     <script src="../javascript/bootstrap.min.js"></script>
     <script src="https://sadi.googlecode.com/svn/trunk/javascript/sadi.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>
-    <script src="http://bumbu.github.io/cytoscape.js/lib/arbor.js"></script>
+    <script src="../javascript/arbor.js"></script>
     <script src="http://bumbu.github.io/cytoscape.js/lib/springy.js"></script>
-    <script src="http://bumbu.github.io/cytoscape.js/src/plugins/jquery.cytoscape-panzoom.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.js"></script>
     <script src="../javascript/redrugs.js"></script>
-    <link rel="stylesheet" href="http://bumbu.github.io/cytoscape.js/src/plugins/jquery.cytoscape-panzoom.css" />
+    <script src="../javascript/cytoscape.js-qtip.js"></script>
+    <script src="../cytoscape.js-cxtmenu.js"></script>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.css" />
 
 <head>
   <title>Repurposing Drugs with Semantics</title>
 </head>
 
 <body data-ng-controller="ReDrugSCtrl">
-<style>
-body { 
-  font: 14px helvetica neue, helvetica, arial, sans-serif;
-}
+  <div id="page">
 
-.container {
-  width: 100%
-}
-
-#results {
-  height: 700px;
-  #width: 100%;
-}
-
-.controlPanel {
-  position:relative;
-  left:-280px;
-  width:300px;
-  border-width:1px;
-  z-index: 10;
-}
-</style>
-  <h1 style="text-align:center">Repurposing Drugs with Semantics</h1>
-  
-  <div>
-    <div class="row-fluid">
-      <div class="span9" id="results">
-      </div>
-      <div style="height:700px" class="span3 well well-small">
-        <div class="tabbable"> <!-- Only required for left/right tabs -->
-          <ul class="nav nav-tabs">
-            <li class="active"><a href="#expand" data-toggle="tab">Search</a></li>
-            <li><a href="#details" data-ng-click="selected = getSelected()" data-toggle="tab">Details</a></li>
-            <li ><a href="#filter" data-toggle="tab">Filter</a></li>
-            <li><a href="#view" data-toggle="tab">Layout</a></li>
-          </ul>
-          <div class="tab-content">
-            <div class="tab-pane" id="filter">
-              Not implemented yet.
-            </div>
-            <div class="tab-pane active" id="expand">
-              <form class="form-horizontal" data-ng-submit="addToGraph(searchTerms)">
-              Search for entities related to:
-              <img width="20" data-ng-show="loading" src="../img/loader.gif"/>
-
-              <div><input id="searchBox" data-ng-model="searchTerms" type="text" data-provide="typeahead" autocomplete="off"/>
-              <input class="btn" type="submit" id="submit" value="Add" /></div>
-              </form>
-              <div class="btn-group">
-                <button data-ng-click="getUpstream(getSelected())" type="button" class="btn"><i class="icon-backward"/> Find upstream</button>
-                <button data-ng-click="getDownstream(getSelected())" type="button" class="btn">Find downstream <i class="icon-forward"/></button>
-              </div>
-              <div class="alert alert-success" data-ng-show="!loading &amp;&amp; loaded != null">Found {{loaded}} connections.</div>
-              <div class="alert alert-danger" data-ng-show="!loading &amp;&amp; error">Server Error. Sorry about that, please try again later.</div>
-            </div>
-            <div class="tab-pane" id="details">
-              <iframe ng-repeat="s in selected" style="height:100px; width:100%;" src="{{s}}"/>
-            </div>
-            <div class="tab-pane" id="view">
-              <form class="form-horizontal" data-ng-submit="cy.layout(layout)">
-                <select id="layout-select" data-ng-model="layout.name">
-                  <option value="grid">Grid</option>
-                  <option value="random">Random</option>
-                  <option value="cose">Cose</option>
-                  <option value="circle">Circle</option>
-                  <option value="breadthfirst">Breadth first</option>
-                </select>
-                <input class="btn" type="submit" id="submit" value="Layout" />
-              </form>
-            </div>
-          </div>
+    <div id="starting-box" class="well opaque centered-box cb-small">
+      <h1>Repurposing Drugs with Semantics</h1>
+      <form class="form-horizontal" data-ng-submit="addToGraph(searchTerms)">
+        <div>
+          <input class="searchBox" data-ng-model="searchTerms" type="text" data-provide="typeahead" autocomplete="off"/>
+          <input class="btn" type="submit" value="Search" />
+          <img width="20" data-ng-show="loading" src="../img/loader.gif"/>
         </div>
+      </form>
+      <i class="help fa fa-info-circle fa-lg"></i>
+      <ul class="help-info centered-box well cb-small">
+        <li>This web application is intended to help discover new possible purposes for existing FDA approved drugs.</li>
+        <li>Please contact us if you have any questions or issues at something@rpi.edu</li>
+      </ul>
+    </div>
+
+    <div id="interface" class="hidden">
+
+      <div id="search-box" class="well opaque">
+        <h2>Repurposing Drugs with Semantics</h2>
+        <form class="form-horizontal" data-ng-submit="addToGraph(searchTerms)">
+          <div>
+            <input class="searchBox" data-ng-model="searchTerms" type="text" data-provide="typeahead" autocomplete="off"/>
+            <input class="btn" type="submit" value="Search" />
+          </div>
+        </form>
+        <div id="btns">
+          <button id="legend-open" class="btn btn-small" type="button"><i class="fa fa-th-large"></i> Legend</button>
+          <button id="options-open" class="btn btn-small" type="button"><i class="fa fa-sliders"></i> Options</button>
+          <button id="help-open" class="btn btn-small" type="button"><i class="fa fa-question"></i> Help</button>
+        </div>
+        <div class="alert alert-success" data-ng-show="!loading &amp;&amp; loaded != null">Found {{loaded}} connections.</div>
+        <div class="alert alert-danger" data-ng-show="!loading &amp;&amp; error">Server Error. Sorry about that, please try again later.</div>
+      </div>
+      
+      <div id="legend-box" class="hidden well centered-box cb-large">
+        <button class="close">&times;</button>
+        <h3>Nodes</h3>
+        <ul class="nodes-legend">
+          <li><div class="activator square"></div><span>Activator</span></li>
+          <li><div class="inhibitor square"></div><span>Inhibitor</span></li>
+          <li><div class="protein square"></div><span>Protein</span></li>
+          <li><div class="other square"></div><span>Undefined</span></li>
+        </ul>
+        <h3>Edges</h3>
+        <ul class="edges-legend">
+          <!-- <li><div class="line"></div><span>Something...</span></li> -->
+          <li><div id="type1" class="line"></div><span>Something...</span></li>
+          <li><div id="type2" class="line"></div><span>Something...</span></li>
+          <li><div id="type3" class="line"></div><span>Something...</span></li>
+          <li><div id="type4" class="line"></div><span>Something...</span></li>
+          <li><div id="type5" class="line"></div><span>Something...</span></li>
+          <li><div id="type6" class="line"></div><span>Something...</span></li>
+        </ul>
+      </div>
+
+      <div id="options-box" class="hidden well centered-box cb-large">
+        <button class="close">&times;</button>
+        <form id="layout" class="form-horizontal" data-ng-submit="cy.layout(layout)">
+          <h3>Layout</h3>
+          <input id="layout-btn" class="btn" type="submit" value="Change"/>
+          <div class="half-col">
+            <input type="radio" class="radio" name="optArbor" id="optArbor" value="arbor" checked="checked" data-ng-model="layout.name"/> Arbor
+            <input type="radio" class="radio" name="optCircle" id="optCircle" value="circle" data-ng-model="layout.name"/> Circle
+            <input type="radio" class="radio" name="optCose" id="optCose" value="cose" data-ng-model="layout.name"/> Cose
+          </div>
+          <div class="half-col">
+            <input type="radio" class="radio" name="optBF" id="optBF" value="breathfirst" data-ng-model="layout.name"/> Breath First
+            <input type="radio" class="radio" name="optRandom" id="optRandom" value="random" data-ng-model="layout.name"/> Random
+          </div>
+        </form>
+      </div>
+
+      <div id="help-box" class="hidden well centered-box cb-small">
+        <button class="close">&times;</button>
+        <p>Something to go here maybe?</p>
+      </div>
+
+      <div id="button-box" class="btn-group hidden">
+        <button data-ng-click="getUpstream(getSelected())" type="button" class="btn">
+          <i class="fa fa-backward"/> Find upstream
+        </button>
+        <button id="details" data-ng-click="getDetails(getSelected())" type="button" class="btn">Details</button>
+        <button data-ng-click="getDownstream(getSelected())" type="button" class="btn">
+          Find downstream <i class="fa fa-forward"/>
+        </button>
       </div>
     </div>
+
+    <div id="results"></div>
+
   </div>
 </body>
 </html>

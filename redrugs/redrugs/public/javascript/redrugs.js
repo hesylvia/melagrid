@@ -94,6 +94,15 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             cy.on('drag', 'node', function(e) {
                 $("#button-box").addClass('hidden');
             });
+            cy.on('free', 'node', function(e) {
+                var selected = $scope.cy.$('node:selected');
+                selected.nodes().each(function(i,d) {
+                    var pos = d.renderedPosition();
+                    $("#button-box").css("left", pos.x-170);
+                    $("#button-box").css("top", pos.y-70);
+                    $("#button-box").removeClass('hidden');
+                });
+            });
 
             cy.on('select', 'node', function(e){
                 var node = e.cyTarget; 

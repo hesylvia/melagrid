@@ -52,16 +52,46 @@
           </div>
         </form>
         <div id="btns">
-          <button id="legend-open" class="btn btn-small" type="button"><i class="fa fa-th-large"></i> Legend</button>
-          <button id="options-open" class="btn btn-small" type="button"><i class="fa fa-sliders"></i> Options</button>
-          <button id="help-open" class="btn btn-small" type="button"><i class="fa fa-question"></i> Help</button>
+          <!-- <button id="legend-open" class="btn btn-small" type="button"><i class="fa fa-th-large"></i> Legend</button> -->
+          <a href="#legend-box" role="button" class="btn btn-small" data-toggle="modal"><i class="fa fa-th-large"></i> Legend</a>
+          <div class="btn-group">
+            <button id="zoom-in" class="btn btn-small"><i class="fa fa-search-plus"></i></button>
+            <button id="zoom-fit" class="btn btn-small"><i class="fa fa-search"></i></button>
+            <button id="zoom-out" class="btn btn-small"><i class="fa fa-search-minus"></i></button>
+          </div>
+          <a href="#options-box" role="button" class="btn btn-small" data-toggle="modal"><i class="fa fa-sliders"></i> Options</a>
+          <a href="#help-box" role="button" class="btn btn-small" data-toggle="modal"><i class="fa fa-question"></i> Help</a>
+          
         </div>
         <div class="alert alert-success" data-ng-show="!loading &amp;&amp; loaded != null">Found {{loaded}} connections.</div>
         <div class="alert alert-danger" data-ng-show="!loading &amp;&amp; error">Server Error. Sorry about that, please try again later.</div>
       </div>
-      
-      <div id="legend-box" class="hidden well centered-box cb-large">
-        <button class="close">&times;</button>
+    <!-- 
+      <div id="zoom-box">
+        <div><button id="zoom-in" class="btn btn-small" type="button"><i class="fa fa-th-large"></i></button></div>
+        <div><button id="zoom-out" class="btn btn-small" type="button"><i class="fa fa-th-large"></i></button></div>
+        <div><button id="zoom-fit" class="btn btn-small" type="button"><i class="fa fa-th-large"></i></button></div>
+      </div> -->
+
+      <div id="button-box" class="btn-group hidden">
+        <button data-ng-click="getUpstream(getSelected())" type="button" class="btn">
+          <i class="fa fa-backward"/> Find upstream
+        </button>
+        <button id="details" data-ng-click="getDetails(getSelected())" type="button" class="btn">Details</button>
+        <button data-ng-click="getDownstream(getSelected())" type="button" class="btn">
+          Find downstream <i class="fa fa-forward"/>
+        </button>
+      </div>
+    </div>
+
+    <div id="results"></div>
+
+    <div id="legend-box" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="legend" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h2 id="legend-lbl">Legend</h2>
+      </div>
+      <div class="modal-body">
         <h3>Nodes</h3>
         <ul class="nodes-legend">
           <li><div class="activator square"></div><span>Activator</span></li>
@@ -80,41 +110,45 @@
           <li><div id="type6" class="line"></div><span>Something...</span></li>
         </ul>
       </div>
-
-      <div id="options-box" class="hidden well centered-box cb-large">
-        <button class="close">&times;</button>
-        <form id="layout" class="form-horizontal" data-ng-submit="cy.layout(layout)">
-          <h3>Layout</h3>
-          <input id="layout-btn" class="btn" type="submit" value="Change"/>
-          <div class="half-col">
-            <input type="radio" class="radio" name="optArbor" id="optArbor" value="arbor" checked="checked" data-ng-model="layout.name"/> Arbor
-            <input type="radio" class="radio" name="optCircle" id="optCircle" value="circle" data-ng-model="layout.name"/> Circle
-            <input type="radio" class="radio" name="optCose" id="optCose" value="cose" data-ng-model="layout.name"/> Cose
-          </div>
-          <div class="half-col">
-            <input type="radio" class="radio" name="optBF" id="optBF" value="breadthfirst" data-ng-model="layout.name"/> Breadth First
-            <input type="radio" class="radio" name="optRandom" id="optRandom" value="random" data-ng-model="layout.name"/> Random
-          </div>
-        </form>
-      </div>
-
-      <div id="help-box" class="hidden well centered-box cb-small">
-        <button class="close">&times;</button>
-        <p>Something to go here maybe?</p>
-      </div>
-
-      <div id="button-box" class="btn-group hidden">
-        <button data-ng-click="getUpstream(getSelected())" type="button" class="btn">
-          <i class="fa fa-backward"/> Find upstream
-        </button>
-        <button id="details" data-ng-click="getDetails(getSelected())" type="button" class="btn">Details</button>
-        <button data-ng-click="getDownstream(getSelected())" type="button" class="btn">
-          Find downstream <i class="fa fa-forward"/>
-        </button>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
       </div>
     </div>
 
-    <div id="results"></div>
+    <div id="options-box" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="options" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h2 id="options-lbl">Options</h2>
+      </div>
+      <div class="modal-body">
+        <form id="layout" class="form-horizontal" data-ng-submit="cy.layout(layout)">
+          <h3>Layout</h3>
+          <input type="radio" class="radio inline" name="optArbor" id="optArbor" value="arbor" checked="checked" data-ng-model="layout.name"/> Arbor
+          <input type="radio" class="radio inline" name="optCircle" id="optCircle" value="circle" data-ng-model="layout.name"/> Circle
+          <input type="radio" class="radio inline" name="optCose" id="optCose" value="cose" data-ng-model="layout.name"/> Cose
+
+          <input type="radio" class="radio inline" name="optBF" id="optBF" value="breadthfirst" data-ng-model="layout.name"/> Breadth First
+          <input type="radio" class="radio inline" name="optRandom" id="optRandom" value="random" data-ng-model="layout.name"/> Random
+          <input id="layout-btn" class="btn btn-small" type="submit" value="Change"/>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+      </div>
+    </div>
+
+    <div id="help-box" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="options" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h2 id="help-lbl">Help</h2>
+      </div>
+      <div class="modal-body">
+        <p>Something to go here....</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+      </div>
+    </div>
 
   </div>
 </body>

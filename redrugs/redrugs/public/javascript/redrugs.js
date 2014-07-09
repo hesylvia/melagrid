@@ -1,22 +1,6 @@
 var redrugsApp = angular.module('redrugsApp', []);
 
 redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
-    $("#legend-open").click(function() {
-        $("#legend-box").removeClass("hidden");
-        $("#page").addClass("opaque");
-    });
-    $("#options-open").click(function() {
-        $("#options-box").removeClass("hidden");
-        $("#page").addClass("opaque");
-    });
-    $("#help-open").click(function() {
-        $("#help-box").removeClass("hidden");
-        $("#page").addClass("opaque");
-    });
-    $(".close").click(function() {
-        $(this).closest("div").addClass("hidden");
-        $("#page").removeClass("opaque");
-    });
     $scope.elements = {
         nodes:[],
         edges:[]
@@ -40,7 +24,6 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             };
             node.data.label = res[$scope.ns.rdfs('label')];
             if (res[$scope.ns.rdf('type')]) res[$scope.ns.rdf('type')].forEach(function(d) {
-                // console.log("d.uri = " + d.uri);
                 node.data.types[d.uri] = true;
             })
             node.data.shape = $scope.getShape(node.data.types);
@@ -107,7 +90,6 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             // console.log(cy.elements());
             cy.elements().unselectify();
             cy.boxSelectionEnabled(false);
-            // cy.hideLabelsOnViewport(true);
             
             // cy.elements().qtip({
             //     content: function(){ return 'Example qTip on ele'; },
@@ -141,11 +123,6 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                 $("#button-box").css("top", pos.y-70);
                 $("#button-box").removeClass('hidden');
 
-                // $("#details").html('<iframe src="' + node.id() + '"/>');
-                // $("#details").addClass("active");
-                // $("#detailsTab").addClass("active");
-                // $("#expand").removeClass("active");
-                // $("#expandTab").removeClass("active");
             });
             
             cy.on('vclick', function(e){
@@ -164,15 +141,6 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                 var node = e.cyTarget;
                 node.removeClass('showLabel');
             });
-            
-        //$scope.container.cytoscapeNavigator();
-            
-            //$scope.cy.elements().one('select','node',function() {
-            //    $scope.selected = $scope.getSelected();
-            //    console.log($scope.selected);
-            //});
-
-            // console.log($scope.cy);
         }
     });
 
@@ -231,7 +199,6 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         var query = [];
         
         selected.nodes().each(function(i,d) {
-            // console.log(d);
             query.push(d.id())
         });
         // console.log(query);
@@ -263,14 +230,13 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                 $scope.services.downstream(g,$scope.appendToGraph,$scope.graph,$scope.handleError);
             },$scope.graph,$scope.handleError);
         },$scope.graph,$scope.handleError);
-        console.log("This is from addToGraph: " + JSON.stringify(g));
+        // console.log("This is from addToGraph: " + JSON.stringify(g));
     }
     $scope.getDetails = function(query) {
         var g = new $.Graph();
         query.forEach(function(uri) {
             $scope.getInfo(uri, g);
-            // $("#details-box").html('<iframe src="' + uri + '"/>');
-            console.log(uri);
+            // console.log(uri);
             window.open(uri);
         });
     }
@@ -282,7 +248,7 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             $scope.createResource(d,g);
         });
         // console.log(g.toJSON());
-        console.log("Upstream " + JSON.stringify(g));
+        // console.log("Upstream " + JSON.stringify(g));
         $scope.services.upstream(g,$scope.appendToGraph,$scope.graph,$scope.handleError);
     }
     $scope.getDownstream = function(query) {
@@ -293,7 +259,7 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             $scope.createResource(d,g);
         });
         // console.log(g.toJSON());
-        console.log("Downstream " + JSON.stringify(g));
+        // console.log("Downstream " + JSON.stringify(g));
         $scope.services.downstream(g,$scope.appendToGraph,$scope.graph,$scope.handleError);
     }
     // $scope.addToGraphU2 = function(query) {
@@ -399,7 +365,7 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                         id: d[$scope.ns.prov('wasDerivedFrom')][0].uri,
                         source: source.data.id,
                         target: target.data.id,
-                        shape: edgeTypes ? $scope.edgeTypes[edgeTypes[0].uri] : 'none',
+                        shape: 'triangle',
                         color: edgeTypes ? $scope.edgeColors[edgeTypes[0].uri] : 'none',
                         probability: d[$scope.ns.sio('probability-value')][0],
                         likelihood: d[$scope.ns.sio('likelihood')][0],
@@ -412,83 +378,28 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             });
         $scope.cy.add(elements);
         $scope.cy.layout($scope.layout);
-        // $scope.loading = false;
         $scope.$apply(function(){
             $scope.loading = false;
         });
         $("#button-box").addClass('hidden');
         $scope.loaded = result.resources.length;
-        //$scope.updateDisplay();
     }
-    $scope.result = $("#result");
-    //$scope.svg = d3.select("#graph");
-    //$scope.force = d3.layout.force();
-    //.size([w, h]);
-    //function updateSize() {
-    //     width = $scope.result.width();
-    //     height = $scope.result.height();
-    //     $scope.svg.attr("width",width)
-    //         .attr("height",height);
-    //     //force.stop()
-    //     $scope.force.size([width, height]);
-    //     //    .start();
-    // }
-    // $(window).resize(updateSize);
-    // $scope.updateDisplay = function() {
-        // $scope.force.stop()
-        //     .charge(-1000)
-        //     .size([$scope.result.width(), $scope.result.height()])
-        //     .linkStrength(1)
-        //     .linkDistance(30)
-        //     .gravity(0.05)
-        //     .nodes($scope.nodes)
-        //     .links($scope.edges);
-        // $scope.edgeSVG = $scope.makeEdgeSVG($scope.edges, $scope.svg);
-        // $scope.nodeSVG = $scope.makeNodeSVG($scope.nodes, $scope.svg);
-        // $scope.force.start();
-    // }
 
-    // $scope.makeEdgeSVG = function(edges, svg) {
-    //     var result = svg.selectAll("line.edge")
-    //         .data(edges).enter()
-    //         .append("line")
-    //         .attr("class","edge")
-    //         .attr("stroke","black");
-    //     return svg.selectAll("line.edge");
-    // }
-    // $scope.makeNodeSVG = function(nodes, svg) {
-    //     var result = svg.selectAll("g.node")
-    //         .data(nodes)
-    //         .enter()
-    //         .append("g")
-    //         .attr("class","node")
-    //     result.append("circle")
-    //         .attr("r",20)
-    //         .attr("stroke","black")
-    //         .attr("fill","steelblue")
-    //     result.append("text")
-    //         .style("text-anchor","middle")
-    //         .style("dominant-baseline","central")
-    //         .text(function(d) {return d.label});
-    //     return svg.selectAll("g.node");
-    // }
-    // $scope.force.on("tick", function() {
-    //     $scope.edgeSVG
-    //         .attr("x1",function(d) {
-    //             return d.source.x;
-    //         })
-    //         .attr("y1",function(d) {
-    //             return d.source.y;
-    //         })
-    //         .attr("x2",function(d) {
-    //             return d.target.x;
-    //         })
-    //         .attr("y2",function(d) {
-    //             return d.target.y;
-    //         })
-    //     $scope.nodeSVG
-    //         .attr("transform", function(d) {
-    //             return "translate("+d.x+","+d.y+")";
-    //         })
-    // })
+    $scope.result = $("#result");
+
+    $("#zoom-fit").click(function() {
+        $scope.cy.fit(50); 
+    });
+    $("#zoom-in").click(function() {
+        $scope.cy.zoom({
+            level: $scope.cy.zoom() + 0.5
+        });
+    });
+    $("#zoom-out").click(function() {
+        if ($scope.cy.zoom() >= 0.5) {
+            $scope.cy.zoom({
+                level: $scope.cy.zoom() - 0.5
+            });
+        }
+    });
 })

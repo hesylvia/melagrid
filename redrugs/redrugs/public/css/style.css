@@ -113,8 +113,8 @@ form {
   width: 20px;
   float: right;
   position: relative;
-  top: 1px;
-  margin-right: 1em;
+  top: 3px;
+  margin-right: 5px;
 }
 #button-box {
   position: relative;
@@ -156,6 +156,9 @@ form {
 }
 #type1, #type2, #type3, #type4, #type5, #type6 {
   background-color: #4679BD;
+}
+#layer-btn {
+  margin-top: 10px;
 }
 
 #results {

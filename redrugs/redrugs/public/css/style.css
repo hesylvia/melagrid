@@ -150,8 +150,14 @@ form {
   background-color: #4679BD;
 }
 
-#layout-btn {
+#layout-btn, #filter-btn {
   float: right;
+}
+#filter-edges input {
+  display: inline-block;
+}
+.buffer-top {
+  margin-top: 10px;
 }
 #button-box {
   position: relative;

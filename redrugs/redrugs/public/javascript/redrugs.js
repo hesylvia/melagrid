@@ -70,6 +70,10 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                 'source-arrow-color': '#F4DD09',
                 'opacity':1,
             })
+            .selector('.hidden')
+            .css({
+                'opacity': 0,
+            })
             .selector('.faded')
             .css({
                 'opacity': 0.25,
@@ -247,6 +251,30 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             window.open(uri);
         });
     }
+    $scope.filter = function(query) {
+        $scope.cy.edges().each(function(i, ele){
+            console.log(ele);
+            ele.addClass("hidden");
+        });
+        if (query.triangle === true) {
+            $scope.cy.elements('edge[color="red"]').each(function(i, ele){ ele.removeClass("hidden"); });
+        }
+        if (query.tee === true) {
+            $scope.cy.elements('edge[color="green"]').each(function(i, ele){ ele.removeClass("hidden"); });
+        }
+        if (query.circle === true) {
+            $scope.cy.elements('edge[color="blue"]').each(function(i, ele){ ele.removeClass("hidden"); });
+        }
+        if (query.diamond === true) {
+            $scope.cy.elements('edge[color="orange"]').each(function(i, ele){ ele.removeClass("hidden"); });
+        }
+        if (query.square === true) {
+            $scope.cy.elements('edge[color="purple"]').each(function(i, ele){ ele.removeClass("hidden"); });
+        }
+        if (query.none === true) {
+            $scope.cy.elements('edge[color="gray"]').each(function(i, ele){ ele.removeClass("hidden"); });
+        }
+    }
     $scope.getUpstream = function(query) {
         $scope.loading = true;
         // console.log(query);
@@ -281,22 +309,22 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
     // }
 
     $scope.edgeTypes = {
-        "http://purl.obolibrary.org/obo/CHEBI_48705": "triangle",
-        "http://purl.obolibrary.org/obo/MI_0190": "none",
-        "http://purl.obolibrary.org/obo/CHEBI_23357": "triangle",
-        "http://purl.obolibrary.org/obo/CHEBI_25212": "triangle",
-        "http://purl.obolibrary.org/obo/CHEBI_35224": "none",
-        "http://purl.obolibrary.org/obo/CHEBI_48706": "tee",
-        "http://purl.org/obo/owl/GO#GO_0048018": "triangle",
-        "http://www.berkeleybop.org/ontologies/owl/GO#GO_0030547":"tee",
-        "http://purl.obolibrary.org/obo/MI_0915": "circle",
-        "http://purl.obolibrary.org/obo/MI_0407": "none",
-        "http://purl.obolibrary.org/obo/MI_0191": "circle",
-        "http://purl.obolibrary.org/obo/MI_0914": "none",
-        "http://purl.obolibrary.org/obo/MI_0217": "diamond",
-        "http://purl.obolibrary.org/obo/MI_0403": "circle",
-        "http://purl.obolibrary.org/obo/MI_0570": "square",
-        "http://purl.obolibrary.org/obo/MI_0194": "square"
+        "http://purl.obolibrary.org/obo/CHEBI_48705": "triangle",   //Agonist
+        "http://purl.obolibrary.org/obo/MI_0190": "none",           //Connection between molecule
+        "http://purl.obolibrary.org/obo/CHEBI_23357": "triangle",   //Cofactor
+        "http://purl.obolibrary.org/obo/CHEBI_25212": "triangle",   //Metabolite
+        "http://purl.obolibrary.org/obo/CHEBI_35224": "none",       //Effector
+        "http://purl.obolibrary.org/obo/CHEBI_48706": "tee",        //Antagonist
+        "http://purl.org/obo/owl/GO#GO_0048018": "triangle",        //???
+        "http://www.berkeleybop.org/ontologies/owl/GO#GO_0030547":"tee",    //???
+        "http://purl.obolibrary.org/obo/MI_0915": "circle",         //Physical Association
+        "http://purl.obolibrary.org/obo/MI_0407": "none",           //Direct Interaction
+        "http://purl.obolibrary.org/obo/MI_0191": "circle",         //Aggregation
+        "http://purl.obolibrary.org/obo/MI_0914": "none",           //Association
+        "http://purl.obolibrary.org/obo/MI_0217": "diamond",        //Phosphorylation Reaction
+        "http://purl.obolibrary.org/obo/MI_0403": "circle",         //Colocalization
+        "http://purl.obolibrary.org/obo/MI_0570": "square",         //Protein Cleavage
+        "http://purl.obolibrary.org/obo/MI_0194": "square"          //Cleavage Reaction
     }
     $scope.edgeColors = {
         "http://purl.obolibrary.org/obo/CHEBI_48705": "red",
@@ -390,9 +418,13 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         });
         $("#button-box").addClass('hidden');
         $scope.loaded = result.resources.length;
-    }
+    };
 
     $scope.result = $("#result");
+
+    $(document).ready(function() {
+        $(".checkEdge").attr('checked','checked');
+    });
 
     $("#zoom-fit").click(function() {
         $scope.cy.fit(50); 
@@ -435,7 +467,6 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             ele.removeClass('hideLabel');
         })
     });
-
     $("#hide-lbl").click(function() {
         $scope.cy.elements().each(function(i, ele){
             ele.addClass('hideLabel');

@@ -23,45 +23,47 @@
 <body data-ng-controller="ReDrugSCtrl">
   <div id="page">
 
-    <div id="starting-box" class="well opaque centered-box cb-small">
+    <div id="starting-box" class="opaque centered-box cb-small">
       <h1>Repurposing Drugs with Semantics</h1>
       <form class="form-horizontal" data-ng-submit="addToGraph(searchTerms)">
         <div>
-          <input class="searchBox" data-ng-model="searchTerms" type="text" data-provide="typeahead" autocomplete="off"/>
+          <input class="searchBox input-xlarge" data-ng-model="searchTerms" type="text" data-provide="typeahead" autocomplete="off" placeholder="Drug, gene, or disease. Ex. Topiramate" />
           <input class="btn" type="submit" value="Search" />
         </div>
       </form>
       <i class="help fa fa-info-circle fa-lg"></i>
-      <ul class="help-info centered-box well cb-small">
-        <li>This web application is intended to help discover new possible purposes for existing FDA approved drugs.</li>
+      <ul class="help-info centered-box cb-small">
+        <li>This web application is intended to help discover new possible purposes for existing FDA approved drugs by searching either a specific drug, disease, or gene and exploring interactions made by these entities.</li>
         <li>Please contact us if you have any questions or issues at something@rpi.edu</li>
       </ul>
     </div>
 
     <div id="interface" class="hidden">
-
-      <div id="search-box" class="well opaque">
-        <h2>Repurposing Drugs with Semantics</h2>
-        <form class="form-horizontal" data-ng-submit="addToGraph(searchTerms)">
-          <div>
-            <input class="searchBox" data-ng-model="searchTerms" type="text" data-provide="typeahead" autocomplete="off"/>
-            <input class="btn" type="submit" value="Search" />
-            <img id="loader" data-ng-show="loading" src="../img/loader.gif"/>
+      <div id="search-box" class="opaque">
+        <button id="min-search" class="btn btn-small"><i class="fa fa-chevron-circle-left"></i></button>
+        <div id="max-search">
+          <h2>Repurposing Drugs with Semantics</h2>
+          <form class="form-horizontal" data-ng-submit="addToGraph(searchTerms)">
+            <div>
+              <input class="searchBox" data-ng-model="searchTerms" type="text" data-provide="typeahead" autocomplete="off"/>
+              <input class="btn" type="submit" value="Search" />
+              <img id="loader" data-ng-show="loading" src="../img/loader.gif"/>
+            </div>
+          </form>
+          <div id="btns">
+            <!-- <button id="legend-open" class="btn btn-small" type="button"><i class="fa fa-th-large"></i> Legend</button> -->
+            <a href="#legend-box" role="button" class="btn btn-small" data-toggle="modal"><i class="fa fa-th-large"></i> Legend</a>
+            <div class="btn-group">
+              <button id="zoom-in" class="btn btn-small"><i class="fa fa-search-plus"></i></button>
+              <button id="zoom-fit" class="btn btn-small"><i class="fa fa-search"></i></button>
+              <button id="zoom-out" class="btn btn-small"><i class="fa fa-search-minus"></i></button>
+            </div>
+            <a href="#options-box" role="button" class="btn btn-small" data-toggle="modal"><i class="fa fa-sliders"></i> Options</a>
+            <a href="#help-box" role="button" class="btn btn-small" data-toggle="modal"><i class="fa fa-question"></i> Help</a>
           </div>
-        </form>
-        <div id="btns">
-          <!-- <button id="legend-open" class="btn btn-small" type="button"><i class="fa fa-th-large"></i> Legend</button> -->
-          <a href="#legend-box" role="button" class="btn btn-small" data-toggle="modal"><i class="fa fa-th-large"></i> Legend</a>
-          <div class="btn-group">
-            <button id="zoom-in" class="btn btn-small"><i class="fa fa-search-plus"></i></button>
-            <button id="zoom-fit" class="btn btn-small"><i class="fa fa-search"></i></button>
-            <button id="zoom-out" class="btn btn-small"><i class="fa fa-search-minus"></i></button>
-          </div>
-          <a href="#options-box" role="button" class="btn btn-small" data-toggle="modal"><i class="fa fa-sliders"></i> Options</a>
-          <a href="#help-box" role="button" class="btn btn-small" data-toggle="modal"><i class="fa fa-question"></i> Help</a>
+          <div class="alert alert-success" data-ng-show="!loading &amp;&amp; loaded != null">Found {{loaded}} connections.</div>
+          <div class="alert alert-danger" data-ng-show="!loading &amp;&amp; error">Server Error. Sorry about that, please try again later.</div>
         </div>
-        <div class="alert alert-success" data-ng-show="!loading &amp;&amp; loaded != null">Found {{loaded}} connections.</div>
-        <div class="alert alert-danger" data-ng-show="!loading &amp;&amp; error">Server Error. Sorry about that, please try again later.</div>
       </div>
 
       <div id="button-box" class="btn-group hidden">
@@ -122,10 +124,13 @@
           <input type="radio" class="radio inline" name="optRandom" id="optRandom" value="random" data-ng-model="layout.name"/> Random
           <input id="layout-btn" class="btn btn-small" type="submit" value="Change"/>
         </form>
+        <h3>Labels</h3>
+        <div class="btn-group">
+          <button id="show-lbl" type="button" class="btn btn-small">Show</button>
+          <button id="hide-lbl" type="button" class="btn btn-small">Hide until hover</button>
+        </div>
       </div>
-      <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-      </div>
+      <div class="modal-footer"></div>
     </div>
 
     <div id="help-box" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="options" aria-hidden="true">
@@ -134,7 +139,13 @@
         <h2 id="help-lbl">Help</h2>
       </div>
       <div class="modal-body">
-        <p>Something to go here....</p>
+        <h3>How To Use</h3>
+        <ul>
+          <li>Click, drag, and scroll to move around the graph</li>
+          <li>Select a node to discover further connections and view more details</li>
+        </ul>
+        <h3>Data</h3>
+        <p>The data is .... from ... Each line represents the generated probability which reflects how likely it is the interaction should take place.</p>
       </div>
       <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>

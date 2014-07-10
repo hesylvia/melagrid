@@ -12,7 +12,7 @@ h1 {
   padding-top: 0.5em;
 }
 h2 {
-  font-size: 18px;
+  font-size: 17px;
   margin: 0;
   padding: 0 2px 0 0;
 }
@@ -62,7 +62,7 @@ form {
 }
 .cb-small {
   height: 200px;
-  width: 350px;
+  width: 400px;
   margin-top: -120px;
   margin-left: -175px;
 }
@@ -94,6 +94,10 @@ form {
   position: absolute;
   z-index: 10;
 }
+#min-search {
+  float: left;
+  margin: 6px 6px 10px 0;
+}
 #search-box {
   position: fixed;
   top: 1em;
@@ -101,13 +105,14 @@ form {
   z-index: 15;
   padding: 1em 1em 0 1em;
   width: 330px;
+  border-radius: 10px;
 }
 #loader {
   width: 20px;
   float: right;
   position: relative;
-  top: 3px;
-  margin-right: 5px;
+  top: 5px;
+  margin-right: 10px;
 }
 #btns {
   margin: 1em 0 1.5em 0;
@@ -155,4 +160,5 @@ form {
   height: 100%;
   width: 100%;
   z-index: 0;
+  cursor: move;
 }

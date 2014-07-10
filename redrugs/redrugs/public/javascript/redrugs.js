@@ -42,7 +42,7 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         style: cytoscape.stylesheet()
             .selector('node')
             .css({
-                'min-zoomed-font-size': 80,
+                'min-zoomed-font-size': 8,
                 'content': 'data(label)',
                 'text-valign': 'center',
                 'color':'white',
@@ -75,9 +75,13 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                 'opacity': 0.25,
                 'text-opacity': 0
             })
+            .selector('.hideLabel')
+            .css({
+                'text-opacity': 0
+            })
             .selector('.showLabel')
             .css({
-                'min-zoomed-font-size': 8
+                'text-opacity': 1
             }),
 
         elements: [] ,
@@ -88,12 +92,19 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             $scope.cy = cy = this;
             // giddy up...
             // console.log(cy.elements());
-            cy.elements().unselectify();
+            cy.edges().unselect();
             cy.boxSelectionEnabled(false);
 
-            cy.on('drag', 'node', function(e) {
+            cy.on('drag', function(e) {
                 $("#button-box").addClass('hidden');
             });
+            cy.on('pan', function(e) {
+                $("#button-box").addClass('hidden');
+            });
+            cy.on('zoom', function(e) {
+                $("#button-box").addClass('hidden');
+            });
+
             cy.on('free', 'node', function(e) {
                 var selected = $scope.cy.$('node:selected');
                 selected.nodes().each(function(i,d) {
@@ -387,15 +398,47 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         $scope.cy.fit(50); 
     });
     $("#zoom-in").click(function() {
+        var midx = $(window).width() / 2;
+        var midy = $(window).height() / 2;
         $scope.cy.zoom({
-            level: $scope.cy.zoom() + 0.5
+            level: $scope.cy.zoom() + 0.25,
+            renderedPosition: { x: midx, y: midy }
         });
     });
     $("#zoom-out").click(function() {
-        if ($scope.cy.zoom() >= 0.5) {
+        if ($scope.cy.zoom() >= 0.25) {
+            var midx = $(window).width() / 2;
+            var midy = $(window).height() / 2;
             $scope.cy.zoom({
-                level: $scope.cy.zoom() - 0.5
+                level: $scope.cy.zoom() - 0.25,
+                renderedPosition: { x: midx, y: midy }
             });
         }
+    });
+
+    $("#min-search").click(function() {
+        $("#max-search").toggle();
+        if($('#min-search').html() === '<i class="fa fa-chevron-circle-left"></i>') {
+            $('#min-search').html('<i class="fa fa-chevron-circle-right"></i>');
+             $('#search-box').css("width", "35px");
+             $('#search-box').css("height", "50px");        
+        }
+        else {
+            $('#min-search').html('<i class="fa fa-chevron-circle-left"></i>');
+            $('#search-box').css("width", "330px");
+            $('#search-box').css("height", "");
+        }
+    });
+
+    $("#show-lbl").click(function() {
+        $scope.cy.elements().each(function(i, ele){
+            ele.removeClass('hideLabel');
+        })
+    });
+
+    $("#hide-lbl").click(function() {
+        $scope.cy.elements().each(function(i, ele){
+            ele.addClass('hideLabel');
+        })
     });
 })

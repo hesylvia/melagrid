@@ -88,19 +88,19 @@
         <h3>Nodes</h3>
         <ul class="nodes-legend">
           <li><div class="activator square"></div><span>Activator</span></li>
-          <li><div class="inhibitor square"></div><span>Inhibitor</span></li>
+          <li><div class="inhibitor square fa fa-star fa-2x"></div><span>Inhibitor</span></li>
           <li><div class="protein square"></div><span>Protein</span></li>
           <li><div class="other square"></div><span>Undefined</span></li>
         </ul>
         <h3>Edges</h3>
         <ul class="edges-legend">
           <!-- <li><div class="line"></div><span>Something...</span></li> -->
-          <li><div id="type1" class="line"></div><span>Triangle = Agonist, Cofactor, Metabolite, or ???</span></li>
-          <li><div id="type2" class="line"></div><span>Tee = Antagonist or ???</span></li>
-          <li><div id="type3" class="line"></div><span>Circle = Physical Association, Aggregation or Colocalization</span></li>
-          <li><div id="type4" class="line"></div><span>Diamond = Phosphorylation Reaction</span></li>
-          <li><div id="type5" class="line"></div><span>Square = Protein Cleavage or Cleavage Reaction</span></li>
-          <li><div id="type6" class="line"></div><span>None = Connection between molecule, Effector, Direct Interaction, or Association</span></li>
+          <li><div id="type1" class="line"></div><span>Agonist, Cofactor, Metabolite, or ???</span></li>
+          <li><div id="type2" class="line"></div><span>Antagonist or ???</span></li>
+          <li><div id="type3" class="line"></div><span>Physical Association, Aggregation or Colocalization</span></li>
+          <li><div id="type4" class="line"></div><span>Phosphorylation Reaction</span></li>
+          <li><div id="type5" class="line"></div><span>Protein Cleavage or Cleavage Reaction</span></li>
+          <li><div id="type6" class="line"></div><span>Connection between molecule, Effector, Direct Interaction, or Association</span></li>
         </ul>
       </div>
       <div class="modal-footer">
@@ -132,22 +132,22 @@
         <h3 class="buffer-top">Filter Edges</h3>
         <form id="filter-edges" class="form-horizontal" data-ng-submit="filter(edges)">
           <label class="checkbox">
-            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.triangle"/> Triangle = Agonist, Cofactor, Metabolite, or ???
+            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.triangle"/> Agonist, Cofactor, Metabolite, or ???
           </label>
           <label class="checkbox">
-            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.tee"/> Tee = Antagonist or ???
+            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.tee"/> Antagonist or ???
           </label>
           <label class="checkbox">
-            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.circle"/> Circle = Physical Association, Aggregation or Colocalization
+            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.circle"/> Physical Association, Aggregation or Colocalization
           </label>
           <label class="checkbox">
-             <input type="checkbox" value="true" checked="checked" data-ng-model="edges.diamond"/> Diamond = Phosphorylation Reaction
+             <input type="checkbox" value="true" checked="checked" data-ng-model="edges.diamond"/> Phosphorylation Reaction
           </label>
           <label class="checkbox">
-            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.square"/> Square = Protein Cleavage or Cleavage Reaction
+            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.square"/> Protein Cleavage or Cleavage Reaction
           </label>
           <label class="checkbox">
-            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.none"/> None = Connection between molecule, Effector, Direct Interaction, or Association
+            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.none"/> Connection between molecule, Effector, Direct Interaction, or Association
           </label>
           <input id="filter-btn" class="btn btn-small" type="submit" value="Filter"/>
         </form>

@@ -89,6 +89,9 @@ form {
   color: black;
   display: none;
 }
+.help:hover + .help-info {
+  display: block;
+}
 
 #interface {
   position: absolute;

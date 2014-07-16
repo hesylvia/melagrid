@@ -11,6 +11,7 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
     $scope.resources = {};
     $scope.searchTerms = "";
     $scope.searchTermURIs = {};
+    $scope.showLabel = true;
     $scope.getNode = function(res) {
         var node = $scope.nodeMap[res.uri];
         if (!node) {
@@ -90,10 +91,6 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             .selector('.hideLabel')
             .css({
                 'text-opacity': 0
-            })
-            .selector('.showLabel')
-            .css({
-                'text-opacity': 1
             }),
 
         elements: [] ,
@@ -137,8 +134,10 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                 
                 cy.elements().addClass('faded');
                 neighborhood.removeClass('faded');
-                node.addClass('showLabel');
-                neighborhood.addClass('showLabel');
+                if (!$scope.showLabel) {
+                    node.removeClass('hideLabel');
+                    neighborhood.removeClass('hideLabel');
+                }
                 
                 $("#button-box").css("left", pos.x-170);
                 $("#button-box").css("top", pos.y-70);
@@ -160,7 +159,9 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             cy.on('vclick', function(e){
                 if( e.cyTarget === cy ){
                     cy.elements().removeClass('faded');
-                    cy.elements().removeClass('showLabel');
+                    if (!$scope.showLabel) {
+                        cy.elements().addClass('hideLabel');
+                    }
                     $("#button-box").addClass('hidden');
                     $("#edge-info").addClass('hidden');
                 }
@@ -168,11 +169,15 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
 
             cy.on('tapdragover', 'node', function(e) {
                 var node = e.cyTarget;
-                node.addClass('showLabel');
+                if (!$scope.showLabel) {
+                    node.removeClass('hideLabel');
+                }
             });
             cy.on('tagdragout', 'node', function(e) {
                 var node = e.cyTarget;
-                node.removeClass('showLabel');
+                if (!$scope.showLabel) {
+                    node.addClass('hideLabel');
+                }
             });
         }
     });
@@ -472,6 +477,11 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                 elements.push(edge);
             });
         $scope.cy.add(elements);
+        if (!$scope.showLabel) {
+            $scope.cy.elements().each(function(i, ele){
+                ele.addClass("hideLabel");
+            });
+        }
         $scope.cy.layout($scope.layout);
         $scope.$apply(function(){
             $scope.loading = false;
@@ -519,11 +529,13 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
     });
 
     $("#show-lbl").click(function() {
+        $scope.showLabel = true;
         $scope.cy.elements().each(function(i, ele){
             ele.removeClass('hideLabel');
         })
     });
     $("#hide-lbl").click(function() {
+        $scope.showLabel = false;
         $scope.cy.elements().each(function(i, ele){
             ele.addClass('hideLabel');
         })

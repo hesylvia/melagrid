@@ -140,13 +140,13 @@
         <h3 class="buffer-top">Filter Edges</h3>
         <form id="filter-edges" data-ng-submit="filter(edges)">
           <label class="checkbox">
-            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.triangle"/> Agonist, Cofactor, Metabolite, or GO_0048018
+            <input type="checkbox" value="true" data-ng-model="edges.triangle" checked="checked"/> Agonist, Cofactor, Metabolite, or GO_0048018
           </label>
           <label class="checkbox">
-            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.tee"/> Antagonist or GO_0030547
+            <input type="checkbox" value="true" data-ng-model="edges.tee" checked="checked"/> Antagonist or GO_0030547
           </label>
           <label class="checkbox">
-            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.circle"/> Physical Association, Aggregation or Colocalization
+            <input type="checkbox" value="true" data-ng-model="edges.circle" checked="checked"/> Physical Association, Aggregation or Colocalization
           </label>
           <label class="checkbox">
              <input type="checkbox" value="true" checked="checked" data-ng-model="edges.diamond"/> Phosphorylation Reaction
@@ -176,9 +176,12 @@
         <ul>
           <li>Click, drag, and scroll to move around the graph</li>
           <li>Select a node to discover further connections and view more details</li>
+          <li>Select an edge to view its specific interaction, probability, and likelihood</li>
         </ul>
         <h3>About</h3>
-        <p>This system visually represents the probability that a link between drugs, proteins, or entire biological processes exists using the opacity of the line that connects nodes. This probability is determined using nanopublications, ontology, and a reasoner. Multiple nanopublications are given a combined probability based off of their method of experimentation and their source of publication. The width of the edges is based on the likelihood of the interactions.</p>
+        <p>This system visually represents the probability and likelihood that a link between drugs, proteins, or entire biological processes exists.</p>
+        <p>This probability is determined using nanopublications, ontology, and a reasoner. Multiple nanopublications are given a combined probability based off of their method of experimentation and their source of publication.</p>
+        <p>The thickness of the lines is based on the likelihood of the interactions while the style of the lines reflects one of three thresholds of probability which can be seen in the legend.</p>
       </div>
       <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>

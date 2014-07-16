@@ -31,7 +31,7 @@
           <input class="btn" type="submit" value="Search" />
         </div>
       </form>
-      <i class="help fa fa-info-circle fa-lg"></i>
+      <span class="help"><i class="fa fa-question-circle fa-lg"></i> Help</span>
       <ul class="help-info centered-box cb-small">
         <li>This web application is intended to help discover new possible purposes for existing FDA approved drugs by searching either a specific drug, disease, or gene and exploring interactions made by these entities.</li>
         <li>Please contact us if you have any questions or issues at something@rpi.edu</li>
@@ -75,6 +75,8 @@
           Find downstream <i class="fa fa-forward"/>
         </button>
       </div>
+
+      <div id="edge-info" class="hidden"></div>
     </div>
 
     <div id="results"></div>
@@ -94,13 +96,19 @@
         </ul>
         <h3>Edges</h3>
         <ul class="edges-legend">
+          <li id="edge-style">
+            <div id="style1" class="line"></div><span>Probability > 0.95</span>
+            <div id="style2" class="line"></div><span>0.95 > Probability > 0.85</span>
+            <div id="style3" class="line"></div><span>0.85 > Probability </span>
+          </li>
           <!-- <li><div class="line"></div><span>Something...</span></li> -->
-          <li><div id="type1" class="line"></div><span>Agonist, Cofactor, Metabolite, or ???</span></li>
-          <li><div id="type2" class="line"></div><span>Antagonist or ???</span></li>
+          <li><div id="type1" class="line"></div><span>Agonist, Cofactor, Metabolite, or GO_0048018</span></li>
+          <li><div id="type2" class="line"></div><span>Antagonist or GO_0030547</span></li>
           <li><div id="type3" class="line"></div><span>Physical Association, Aggregation or Colocalization</span></li>
           <li><div id="type4" class="line"></div><span>Phosphorylation Reaction</span></li>
           <li><div id="type5" class="line"></div><span>Protein Cleavage or Cleavage Reaction</span></li>
           <li><div id="type6" class="line"></div><span>Connection between molecule, Effector, Direct Interaction, or Association</span></li>
+          <li><div id="type7" class="line"></div><span>Undefined interaction</span></li>
         </ul>
       </div>
       <div class="modal-footer">
@@ -130,12 +138,12 @@
           <button id="hide-lbl" type="button" class="btn btn-small">Hide until hover</button>
         </div>
         <h3 class="buffer-top">Filter Edges</h3>
-        <form id="filter-edges" class="form-horizontal" data-ng-submit="filter(edges)">
+        <form id="filter-edges" data-ng-submit="filter(edges)">
           <label class="checkbox">
-            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.triangle"/> Agonist, Cofactor, Metabolite, or ???
+            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.triangle"/> Agonist, Cofactor, Metabolite, or GO_0048018
           </label>
           <label class="checkbox">
-            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.tee"/> Antagonist or ???
+            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.tee"/> Antagonist or GO_0030547
           </label>
           <label class="checkbox">
             <input type="checkbox" value="true" checked="checked" data-ng-model="edges.circle"/> Physical Association, Aggregation or Colocalization
@@ -148,6 +156,9 @@
           </label>
           <label class="checkbox">
             <input type="checkbox" value="true" checked="checked" data-ng-model="edges.none"/> Connection between molecule, Effector, Direct Interaction, or Association
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.other"/> Undefined
           </label>
           <input id="filter-btn" class="btn btn-small" type="submit" value="Filter"/>
         </form>
@@ -166,8 +177,8 @@
           <li>Click, drag, and scroll to move around the graph</li>
           <li>Select a node to discover further connections and view more details</li>
         </ul>
-        <h3>Data</h3>
-        <p>The data is .... from ... Each line represents the generated probability which reflects how likely it is the interaction should take place.</p>
+        <h3>About</h3>
+        <p>This system visually represents the probability that a link between drugs, proteins, or entire biological processes exists using the opacity of the line that connects nodes. This probability is determined using nanopublications, ontology, and a reasoner. Multiple nanopublications are given a combined probability based off of their method of experimentation and their source of publication. The width of the edges is based on the likelihood of the interactions.</p>
       </div>
       <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>

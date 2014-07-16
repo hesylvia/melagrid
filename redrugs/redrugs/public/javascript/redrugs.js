@@ -56,13 +56,16 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                 'border-color': 'data(linecolor)',
                 'border-width': 2,
                 'height': 'data(size)',
-                'width': 'data(size)'
+                'width': 'data(size)',
+                'cursor': 'pointer'
             })
             .selector('edge')
             .css({
-                // 'content': 'Probability: data(probability)',
+                // 'content': 'data(label)',
                 'opacity':'data(probability)',
-                'width':"mapData(likelihood,0,2.5,5,50)",
+                // 'width':"mapData(likelihood,0,2.5,5,50)",
+                'width':'data(width)',
+                'line-style': 'data(lineStyle)',
                 'target-arrow-shape': 'data(shape)',
                 'target-arrow-color': 'data(color)',
                 'line-color': 'data(color)'
@@ -101,17 +104,19 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             $scope.cy = cy = this;
             // giddy up...
             // console.log(cy.elements());
-            cy.edges().unselect();
             cy.boxSelectionEnabled(false);
 
             cy.on('drag', function(e) {
                 $("#button-box").addClass('hidden');
+                $("#edge-info").addClass('hidden');
             });
             cy.on('pan', function(e) {
                 $("#button-box").addClass('hidden');
+                $("#edge-info").addClass('hidden');
             });
             cy.on('zoom', function(e) {
                 $("#button-box").addClass('hidden');
+                $("#edge-info").addClass('hidden');
             });
 
             cy.on('free', 'node', function(e) {
@@ -140,12 +145,24 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                 $("#button-box").removeClass('hidden');
 
             });
+            cy.on('click', 'edge', function(e) {
+                var pos = e.cyRenderedPosition;
+                var edge = e.cyTarget;
+                console.log(edge.data().width); 
+                $("#edge-info").html("<p>Interaction: " + edge.data().types + "</p><p> Probability: " + edge.data().probability + "</p> Likelihood: " + edge.data().likelihood );
+                $("#edge-info").css("left", pos.x+20);
+                $("#edge-info").css("top", pos.y-10);
+                $("#edge-info").removeClass('hidden');
+                // console.log(e.cyRenderedPosition);
+                // console.log(edge.data().types);
+            });
             
             cy.on('vclick', function(e){
                 if( e.cyTarget === cy ){
                     cy.elements().removeClass('faded');
                     cy.elements().removeClass('showLabel');
                     $("#button-box").addClass('hidden');
+                    $("#edge-info").addClass('hidden');
                 }
             });
 
@@ -220,6 +237,19 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         // console.log(query);
         return query;
     }
+    // $scope.getInfo = function(uri, graph) {
+    //     var entity = graph.getResource(uri, 'uri');
+    //     entity[$scope.ns.rdf('title')] = graph.getResource($scope.ns.dcterms('title'));
+    //     console.log(entity[$scope.ns.rdf('title')]);
+    // }
+    $scope.getDetails = function(query) {
+        var g = new $.Graph();
+        query.forEach(function(uri) {
+            // $scope.getInfo(uri, g);
+            // console.log(uri);
+            window.open(uri);
+        });
+    }
     $scope.createResource = function(uri, graph) {
         var entity = graph.getResource(uri,'uri');
         entity[$scope.ns.rdf('type')] = [
@@ -228,11 +258,6 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         ];
         return entity;
     }
-    // $scope.getInfo = function(uri, graph) {
-    //     var entity = graph.getResource(uri, 'uri');
-    //     entity[$scope.ns.rdf('title')] = graph.getResource($scope.ns.dcterms('title'));
-    //     console.log(entity[$scope.ns.rdf('title')]);
-    // }
     $scope.addToGraph = function(query) {
         $scope.loading = true;
         $('#starting-box').css("display", "none");
@@ -247,14 +272,6 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             },$scope.graph,$scope.handleError);
         },$scope.graph,$scope.handleError);
         // console.log("This is from addToGraph: " + JSON.stringify(g));
-    }
-    $scope.getDetails = function(query) {
-        var g = new $.Graph();
-        query.forEach(function(uri) {
-            // $scope.getInfo(uri, g);
-            // console.log(uri);
-            window.open(uri);
-        });
     }
     $scope.getUpstream = function(query) {
         $scope.loading = true;
@@ -290,22 +307,22 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
     // }
 
     $scope.edgeTypes = {
-        "http://purl.obolibrary.org/obo/CHEBI_48705": "triangle",   //Agonist
-        "http://purl.obolibrary.org/obo/MI_0190": "none",           //Connection between molecule
-        "http://purl.obolibrary.org/obo/CHEBI_23357": "triangle",   //Cofactor
-        "http://purl.obolibrary.org/obo/CHEBI_25212": "triangle",   //Metabolite
-        "http://purl.obolibrary.org/obo/CHEBI_35224": "none",       //Effector
-        "http://purl.obolibrary.org/obo/CHEBI_48706": "tee",        //Antagonist
-        "http://purl.org/obo/owl/GO#GO_0048018": "triangle",        //???
-        "http://www.berkeleybop.org/ontologies/owl/GO#GO_0030547":"tee",    //???
-        "http://purl.obolibrary.org/obo/MI_0915": "circle",         //Physical Association
-        "http://purl.obolibrary.org/obo/MI_0407": "none",           //Direct Interaction
-        "http://purl.obolibrary.org/obo/MI_0191": "circle",         //Aggregation
-        "http://purl.obolibrary.org/obo/MI_0914": "none",           //Association
-        "http://purl.obolibrary.org/obo/MI_0217": "diamond",        //Phosphorylation Reaction
-        "http://purl.obolibrary.org/obo/MI_0403": "circle",         //Colocalization
-        "http://purl.obolibrary.org/obo/MI_0570": "square",         //Protein Cleavage
-        "http://purl.obolibrary.org/obo/MI_0194": "square"          //Cleavage Reaction
+        "http://purl.obolibrary.org/obo/CHEBI_48705": "Agonist",                    //Triangle
+        "http://purl.obolibrary.org/obo/MI_0190": "Connection between molecule",    //None
+        "http://purl.obolibrary.org/obo/CHEBI_23357": "Cofactor",                   //Triangle
+        "http://purl.obolibrary.org/obo/CHEBI_25212": "Metabolite",                 //Triangle
+        "http://purl.obolibrary.org/obo/CHEBI_35224": "Effector",                   //None
+        "http://purl.obolibrary.org/obo/CHEBI_48706": "Antagonist",                 //Tee
+        "http://purl.org/obo/owl/GO#GO_0048018": "GO_0048018",                      //Triangle
+        "http://www.berkeleybop.org/ontologies/owl/GO#GO_0030547":"GO_0030547",     //Tee
+        "http://purl.obolibrary.org/obo/MI_0915": "Physical Association",           //Circle 
+        "http://purl.obolibrary.org/obo/MI_0407": "Direct Interaction",             //None 
+        "http://purl.obolibrary.org/obo/MI_0191": "Aggregation",                    //Circle
+        "http://purl.obolibrary.org/obo/MI_0914": "Association",                    //None 
+        "http://purl.obolibrary.org/obo/MI_0217": "Phosphorylation Reaction",       //Diamond 
+        "http://purl.obolibrary.org/obo/MI_0403": "Colocalization",                 //Circle 
+        "http://purl.obolibrary.org/obo/MI_0570": "Protein Cleavage",               //Square 
+        "http://purl.obolibrary.org/obo/MI_0194": "Cleavage Reaction"               //Square 
     }
     var ugly = "#9AFE2E";
     $scope.edgeColors = {
@@ -399,6 +416,9 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         } if (query.none === true) {
             $scope.cy.elements('edge[color="#FF0040"]').each(function(i, ele){ 
                 ele.removeClass("hidden"); });
+        } if (query.other === true) {
+            $scope.cy.elements('edge[color="#BABABA"]').each(function(i, ele){ 
+                ele.removeClass("hidden"); });
         }
     }
 
@@ -424,21 +444,31 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                 elements.push(source);
                 elements.push(target);
                 var edgeTypes = d[$scope.ns.rdf('type')];
+                var lineStyle;
+                if (d[$scope.ns.sio('probability-value')][0] > 0.95) {
+                    lineStyle = 'solid';
+                } else if (d[$scope.ns.sio('probability-value')][0] > 0.85) {
+                    lineStyle = 'dashed';
+                } else {
+                    lineStyle = 'dotted';
+                }
                 var edge = {
                     group: "edges",
                     data: $().extend({}, d, {
                         id: d[$scope.ns.prov('wasDerivedFrom')][0].uri,
                         source: source.data.id,
-                        target: target.data.id,
+                        target: target.data.id, 
                         shape: 'triangle',
+                        types: (edgeTypes && !$scope.edgeTypes[edgeTypes[0].uri]) ? 'Undefined' : $scope.edgeTypes[edgeTypes[0].uri],
                         color: edgeTypes ? $scope.edgeColors[edgeTypes[0].uri] : 'none',
                         probability: d[$scope.ns.sio('probability-value')][0],
                         likelihood: d[$scope.ns.sio('likelihood')][0],
+                        lineStyle: lineStyle,
+                        width: (d[$scope.ns.sio('likelihood')][0] * 5) + 1,
                         resource: d
                     })
                 };
-                if (edgeTypes && !$scope.edgeTypes[edgeTypes[0].uri])
-                    console.log("Missing interaction type:", edgeTypes[0].uri);
+                console.log(edge.data.types);
                 elements.push(edge);
             });
         $scope.cy.add(elements);
@@ -451,11 +481,7 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
     };
 
     $scope.result = $("#result");
-
-    $(document).ready(function() {
-        $(".checkEdge").attr('checked','checked');
-    });
-
+    
     $("#zoom-fit").click(function() {
         $scope.cy.fit(50); 
     });

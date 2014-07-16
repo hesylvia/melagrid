@@ -11,10 +11,8 @@
     <script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>
     <script src="../javascript/arbor.js"></script>
     <script src="http://bumbu.github.io/cytoscape.js/lib/springy.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.js"></script>
     <script src="../javascript/redrugs.js"></script>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" />
-    <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.css" />
 
 <head>
   <title>Repurposing Drugs with Semantics</title>
@@ -31,11 +29,12 @@
           <input class="btn" type="submit" value="Search" />
         </div>
       </form>
-      <span class="help"><i class="fa fa-question-circle fa-lg"></i> Help</span>
-      <ul class="help-info centered-box cb-small">
-        <li>This web application is intended to help discover new possible purposes for existing FDA approved drugs by searching either a specific drug, disease, or gene and exploring interactions made by these entities.</li>
-        <li>Please contact us if you have any questions or issues at something@rpi.edu</li>
-      </ul>
+      <span class="help"><i class="fa fa-question-circle fa-lg"></i> Help
+        <ul class="help-info centered-box cb-small">
+          <li>This web application is intended to help discover new possible purposes for existing FDA approved drugs by searching either a specific drug, disease, or gene and exploring interactions made by these entities.</li>
+          <li>Please contact us if you have any questions or issues at something@rpi.edu</li>
+        </ul>
+      </span> 
     </div>
 
     <div id="interface" class="hidden">
@@ -138,27 +137,27 @@
           <button id="hide-lbl" type="button" class="btn btn-small">Hide until hover</button>
         </div>
         <h3 class="buffer-top">Filter Edges</h3>
-        <form id="filter-edges" data-ng-submit="filter(edges)">
+        <form id="filter-edges" data-ng-submit="filter(edgesFilter)">
           <label class="checkbox">
-            <input type="checkbox" value="true" data-ng-model="edges.triangle" checked="checked"/> Agonist, Cofactor, Metabolite, or GO_0048018
+            <input type="checkbox" name="triangle" data-ng-model="edgesFilter.triangle"/> Agonist, Cofactor, Metabolite, or GO_0048018
           </label>
           <label class="checkbox">
-            <input type="checkbox" value="true" data-ng-model="edges.tee" checked="checked"/> Antagonist or GO_0030547
+            <input type="checkbox" name="tee" data-ng-model="edgesFilter.tee" /> Antagonist or GO_0030547
           </label>
           <label class="checkbox">
-            <input type="checkbox" value="true" data-ng-model="edges.circle" checked="checked"/> Physical Association, Aggregation or Colocalization
+            <input type="checkbox" name="circle" data-ng-model="edgesFilter.circle"/> Physical Association, Aggregation or Colocalization
           </label>
           <label class="checkbox">
-             <input type="checkbox" value="true" checked="checked" data-ng-model="edges.diamond"/> Phosphorylation Reaction
+             <input type="checkbox" name="diamond" data-ng-model="edgesFilter.diamond"/> Phosphorylation Reaction
           </label>
           <label class="checkbox">
-            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.square"/> Protein Cleavage or Cleavage Reaction
+            <input type="checkbox" name="square" data-ng-model="edgesFilter.square"/> Protein Cleavage or Cleavage Reaction
           </label>
           <label class="checkbox">
-            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.none"/> Connection between molecule, Effector, Direct Interaction, or Association
+            <input type="checkbox" name="none" data-ng-model="edgesFilter.none"/> Connection between molecule, Effector, Direct Interaction, or Association
           </label>
           <label class="checkbox">
-            <input type="checkbox" value="true" checked="checked" data-ng-model="edges.other"/> Undefined
+            <input type="checkbox" name="other" data-ng-model="edgesFilter.other"/> Undefined
           </label>
           <input id="filter-btn" class="btn btn-small" type="submit" value="Filter"/>
         </form>

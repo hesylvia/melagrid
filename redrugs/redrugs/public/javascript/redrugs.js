@@ -8,6 +8,15 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
     $scope.nodeMap = {};
     $scope.edges = [];
     $scope.edgeMap = {};
+    $scope.edgesFilter = {
+        triangle: true,
+        tee: true,
+        circle: true,
+        diamond: true,
+        square: true,
+        none: true,
+        other: true
+    };
     $scope.resources = {};
     $scope.searchTerms = "";
     $scope.searchTermURIs = {};
@@ -403,6 +412,7 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         $scope.cy.edges().each(function(i, ele){
             ele.addClass("hidden");
         });
+        console.log(query);
         if (query.triangle === true) {
             $scope.cy.elements('edge[color="#9AFE2E"]').each(function(i, ele){ 
                 ele.removeClass("hidden"); });
@@ -539,5 +549,13 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         $scope.cy.elements().each(function(i, ele){
             ele.addClass('hideLabel');
         })
+    });
+
+    $('.help').mouseover(function(){
+      $('.help-info').show();
+    });
+
+    $('.help').mouseleave(function(){
+      $('.help-info').hide();
     });
 })

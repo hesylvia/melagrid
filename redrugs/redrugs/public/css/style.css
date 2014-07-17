@@ -21,6 +21,7 @@ h3 {
   padding: 0;
   margin: 0 0 0.5em 0;
   border-bottom: 1px solid #CCC;
+  display: block;
 }
 h4 {
   font-size: 14px;
@@ -35,6 +36,9 @@ li {
 }
 form {
   margin: 5px 0;
+}
+hr {
+  margin: 3px 0;
 }
 
 .hidden {
@@ -132,9 +136,20 @@ form {
   margin: 1em 0 1.5em 0;
 }
 
-/*#legend-box {
-  text-align: left;
-}*/
+.found {
+  background-color: #FFFFFF;
+  color: #2C9378;
+  border-color: #2C9378;
+  text-shadow: 0px 1px 0px #FFFFFF;
+}
+.not-found {
+  background-color: #000000;
+  border-color: #FD0140;
+  color: #FD0140;
+  text-shadow: 0px 1px 0px #000000;
+}
+
+
 .nodes-legend {
   height: 30px;
 }
@@ -143,7 +158,6 @@ form {
   padding-right: 30px;
 }
 .edges-legend {
-  height: 185px;
   overflow-y: auto;
 }
 
@@ -176,7 +190,7 @@ form {
 }
 
 .line {
-  width: 50px;
+  width: 75px;
   position: relative;
   top: -1px;
 }
@@ -187,7 +201,7 @@ form {
 } #type3 {
   border-bottom: #00FFFF solid 5px;
 } #type4 {
-  border-bottom: #000000 solid 5px;
+  border-bottom: #9800FF solid 5px;
 } #type5 {
   border-bottom: #000000 solid 5px;
 } #type6 {
@@ -201,6 +215,20 @@ form {
   border-bottom: #BABABA dashed 5px;
 } #style3 {
   border-bottom: #BABABA dotted 5px;
+}
+
+.inline-options {
+  display: inline-block;
+  margin-top: 1em;
+  margin-right: 50px;
+}
+.inline-h3 {
+  float: left;
+  margin-right: 0.5em;
+  border: #FFF;
+}
+.inline-btns {
+  margin-top: 5px;
 }
 
 #layout-btn, #filter-btn {
@@ -247,4 +275,10 @@ form {
   width: 100%;
   z-index: 0;
   cursor: pointer;
+}
+
+#random-bfs {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
 }

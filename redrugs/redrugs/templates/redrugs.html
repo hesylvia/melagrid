@@ -60,17 +60,18 @@
             <a href="#options-box" role="button" class="btn btn-small" data-toggle="modal"><i class="fa fa-sliders"></i> Options</a>
             <a href="#help-box" role="button" class="btn btn-small" data-toggle="modal"><i class="fa fa-question"></i> Help</a>
           </div>
-          <div class="alert alert-success" data-ng-show="!loading &amp;&amp; loaded != null">Found {{loaded}} connections.</div>
-          <div class="alert alert-danger" data-ng-show="!loading &amp;&amp; error">Server Error. Sorry about that, please try again later.</div>
+          <div class="alert found" data-ng-show="!loading &amp;&amp; loaded != null">Found {{loaded}} connections.</div>
+          <div class="alert not-found" data-ng-show="!loading &amp;&amp; error">Server Error. Sorry about that, please try again later.</div>
         </div>
       </div>
 
       <div id="button-box" class="btn-group hidden">
-        <button data-ng-click="getUpstream(getSelected())" type="button" class="btn">
+        <button data-ng-click="getUpstream(getSelected('uri'))" type="button" class="btn">
           <i class="fa fa-backward"/> Find upstream
         </button>
-        <button id="details" data-ng-click="getDetails(getSelected())" type="button" class="btn">Details</button>
-        <button data-ng-click="getDownstream(getSelected())" type="button" class="btn">
+        <button id="details" data-ng-click="getDetails(getSelected('uri'))" type="button" class="btn">Details</button>
+        <button id="bfs" data-ng-click="showBFS(getSelected('id'))" type="button" class="btn">Show BFS</button>
+        <button data-ng-click="getDownstream(getSelected('uri'))" type="button" class="btn">
           Find downstream <i class="fa fa-forward"/>
         </button>
       </div>
@@ -100,14 +101,15 @@
             <div id="style2" class="line"></div><span>0.95 > Probability > 0.85</span>
             <div id="style3" class="line"></div><span>0.85 > Probability </span>
           </li>
+          <hr />
           <!-- <li><div class="line"></div><span>Something...</span></li> -->
           <li><div id="type1" class="line"></div><span>Agonist, Cofactor, Metabolite, or GO_0048018</span></li>
           <li><div id="type2" class="line"></div><span>Antagonist or GO_0030547</span></li>
           <li><div id="type3" class="line"></div><span>Physical Association, Aggregation or Colocalization</span></li>
           <li><div id="type4" class="line"></div><span>Phosphorylation Reaction</span></li>
           <li><div id="type5" class="line"></div><span>Protein Cleavage or Cleavage Reaction</span></li>
-          <li><div id="type6" class="line"></div><span>Connection between molecule, Effector, Direct Interaction, or Association</span></li>
-          <li><div id="type7" class="line"></div><span>Undefined interaction</span></li>
+          <li><div id="type6" class="line"></div><span>Connection between molecules, Effector, Direct Interaction, or Association</span></li>
+          <li><div id="type7" class="line"></div><span>Interaction with Disease</span></li>
         </ul>
       </div>
       <div class="modal-footer">
@@ -131,13 +133,23 @@
           <input type="radio" class="radio inline" name="optRandom" id="optRandom" value="random" data-ng-model="layout.name"/> Random
           <input id="layout-btn" class="btn btn-small" type="submit" value="Change"/>
         </form>
-        <h3>Labels</h3>
-        <div class="btn-group">
-          <button id="show-lbl" type="button" class="btn btn-small">Show</button>
-          <button id="hide-lbl" type="button" class="btn btn-small">Hide until hover</button>
+        <div class="inline-options">
+          <h3 class="inline-h3">Labels:</h3>
+          <div class="btn-group inline-btns" data-toggle="buttons-radio">
+            <button id="show-lbl" type="button" class="btn btn-small">Show</button>
+            <button id="hide-lbl" type="button" class="btn btn-small">Hide</button>
+          </div>
         </div>
-        <h3 class="buffer-top">Filter Edges</h3>
+        <div class="inline-options">
+          <h3 class="inline-h3">Background:</h3>
+          <div class="btn-group inline-btns" data-toggle="buttons-radio">
+            <button id="bg-dark" type="button" class="btn btn-small">Dark</button>
+            <button id="bg-light" type="button" class="btn btn-small">Light</button>
+          </div>
+        </div>
+        
         <form id="filter-edges" data-ng-submit="filter(edgesFilter)">
+          <h3 class="buffer-top">Filter Edges</h3>
           <label class="checkbox">
             <input type="checkbox" name="triangle" data-ng-model="edgesFilter.triangle"/> Agonist, Cofactor, Metabolite, or GO_0048018
           </label>
@@ -154,10 +166,10 @@
             <input type="checkbox" name="square" data-ng-model="edgesFilter.square"/> Protein Cleavage or Cleavage Reaction
           </label>
           <label class="checkbox">
-            <input type="checkbox" name="none" data-ng-model="edgesFilter.none"/> Connection between molecule, Effector, Direct Interaction, or Association
+            <input type="checkbox" name="none" data-ng-model="edgesFilter.none"/> Connection between molecules, Effector, Direct Interaction, or Association
           </label>
           <label class="checkbox">
-            <input type="checkbox" name="other" data-ng-model="edgesFilter.other"/> Undefined
+            <input type="checkbox" name="other" data-ng-model="edgesFilter.other"/> Interaction with Disease
           </label>
           <input id="filter-btn" class="btn btn-small" type="submit" value="Filter"/>
         </form>
@@ -173,9 +185,10 @@
       <div class="modal-body">
         <h3>How To Use</h3>
         <ul>
-          <li>Click, drag, and scroll to move around the graph</li>
-          <li>Select a node to discover further connections and view more details</li>
-          <li>Select an edge to view its specific interaction, probability, and likelihood</li>
+          <li>Click, drag, and scroll to move around the graph.</li>
+          <li>Double-click to select a node to discover further connections, view more details, or trigger a visual breadth first search starting at the selected node.</li>
+          <li>Double-click to select an edge to view its specific interaction, probability, and likelihood.</li>
+          <li>To unselect edges and/or nodes, double-click on the background.</li>
         </ul>
         <h3>About</h3>
         <p>This system visually represents the probability and likelihood that a link between drugs, proteins, or entire biological processes exists.</p>
@@ -186,7 +199,7 @@
         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
       </div>
     </div>
-
+    <button id="random-bfs" class="btn btn-small hidden">Random BFS</button>
   </div>
 </body>
 </html>

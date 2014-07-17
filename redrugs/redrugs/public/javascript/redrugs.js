@@ -27,11 +27,14 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             node = $scope.nodeMap[res.uri] = {
                 group: "nodes",
                 data: {
-                    id: res.uri,
+                    uri: res.uri,
+                    // id: res.uri,
                     types: {},
                     resource: res
                 }
             };
+            // Remove all non-alphanumerical and replace space and underscore with hypen
+            node.data.id = res[$scope.ns.rdfs('label')][0].replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-');
             node.data.label = res[$scope.ns.rdfs('label')];
             if (res[$scope.ns.rdf('type')]) res[$scope.ns.rdf('type')].forEach(function(d) {
                 node.data.types[d.uri] = true;
@@ -71,9 +74,7 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             })
             .selector('edge')
             .css({
-                // 'content': 'data(label)',
                 'opacity':'data(probability)',
-                // 'width':"mapData(likelihood,0,2.5,5,50)",
                 'width':'data(width)',
                 'line-style': 'data(lineStyle)',
                 'target-arrow-shape': 'data(shape)',
@@ -87,6 +88,14 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                 'target-arrow-color': '#D8D8D8',
                 'source-arrow-color': '#D8D8D8',
                 'opacity':1,
+            })
+            .selector('.highlighted')
+            .css({
+                'background-color': '#000000',
+                'line-color': '#000000',
+                'target-arrow-color': '#000000',
+                'transition-property': 'background-color, line-color, target-arrow-color, height, width',
+                'transition-duration': '0.5s'
             })
             .selector('.hidden')
             .css({
@@ -129,8 +138,8 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                 var selected = $scope.cy.$('node:selected');
                 selected.nodes().each(function(i,d) {
                     var pos = d.renderedPosition();
-                    $("#button-box").css("left", pos.x-170);
-                    $("#button-box").css("top", pos.y-70);
+                    $("#button-box").css("left", pos.x-220);
+                    $("#button-box").css("top", pos.y-60);
                     $("#button-box").removeClass('hidden');
                 });
             });
@@ -148,11 +157,32 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                     neighborhood.removeClass('hideLabel');
                 }
                 
-                $("#button-box").css("left", pos.x-170);
-                $("#button-box").css("top", pos.y-70);
+                $("#button-box").css("left", pos.x-220);
+                $("#button-box").css("top", pos.y-60);
                 $("#button-box").removeClass('hidden');
 
+                // console.log(cy.json());
+
+                // var root = "#" + node.id();
+                // var bfs = cy.elements().bfs(root, function(i, depth){
+                //     console.log( 'visit ' + this.id() );
+                // }, true);
+                // console.log(bfs);
+                // console.log(root);
+            
+                // var i = 0;
+                // var highlightNextEle = function(){
+                //   bfs.path[i].addClass('highlighted');
+                  
+                //   if( i < bfs.path.length - 1){
+                //     i++;
+                //     setTimeout(highlightNextEle, 100);
+                //   }
+                // };
+
+                // highlightNextEle();
             });
+
             cy.on('click', 'edge', function(e) {
                 var pos = e.cyRenderedPosition;
                 var edge = e.cyTarget;
@@ -173,6 +203,7 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                     }
                     $("#button-box").addClass('hidden');
                     $("#edge-info").addClass('hidden');
+                    cy.elements().removeClass("highlighted");
                 }
             });
 
@@ -218,9 +249,9 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         source: function(query, process) {
             // console.log(query);
             var g = new $.Graph();
-            var res = g.getResource($scope.ns.local("query"))
+            var res = g.getResource($scope.ns.local("query"));
             res[$scope.ns.prov('value')] = [query];
-            res[$scope.ns.rdf('type')] = [g.getResource($scope.ns.pml('Query'))]
+            res[$scope.ns.rdf('type')] = [g.getResource($scope.ns.pml('Query'))];
             $scope.services.search(g,function(graph) {
                 var keywords = graph.resources.map(function(d) {
                     return graph.getResource(d);
@@ -239,29 +270,43 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         $scope.error = true;
         $scope.loading = false;
     }
-    $scope.getSelected = function() {
+    $scope.getSelected = function(attr) {
         if (!$scope.cy) return [];
         var selected = $scope.cy.$('node:selected');
         // console.log(selected.nodes());
         var query = [];
         
         selected.nodes().each(function(i,d) {
-            query.push(d.id())
+            query.push(d.data(attr));
         });
         // console.log(query);
         return query;
     }
-    // $scope.getInfo = function(uri, graph) {
-    //     var entity = graph.getResource(uri, 'uri');
-    //     entity[$scope.ns.rdf('title')] = graph.getResource($scope.ns.dcterms('title'));
-    //     console.log(entity[$scope.ns.rdf('title')]);
-    // }
     $scope.getDetails = function(query) {
         var g = new $.Graph();
         query.forEach(function(uri) {
-            // $scope.getInfo(uri, g);
-            // console.log(uri);
             window.open(uri);
+        });
+    }
+    $scope.showBFS = function(query) {
+        var g = new $.Graph();
+        query.forEach(function(id) {
+            var root = "#" + id;
+            var bfs = cy.elements().bfs(root, function(i, depth){
+                console.log( 'visit ' + this.id() );
+            }, true);
+        
+            var i = 0;
+            var highlightNextEle = function(){
+              bfs.path[i].addClass('highlighted');
+              bfs.path[i].removeClass('faded');
+              
+              if( i < bfs.path.length - 1){
+                i++;
+                setTimeout(highlightNextEle, 100);
+              }
+            };
+            highlightNextEle();
         });
     }
     $scope.createResource = function(uri, graph) {
@@ -276,6 +321,7 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         $scope.loading = true;
         $('#starting-box').css("display", "none");
         $('#interface').removeClass("hidden");
+        $('#random-bfs').removeClass("hidden");
         // console.log(query);
         var g = new $.Graph();
         $scope.createResource($scope.searchTermURIs[$.trim(query)],g);
@@ -321,38 +367,55 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
     // }
 
     $scope.edgeTypes = {
-        "http://purl.obolibrary.org/obo/CHEBI_48705": "Agonist",                    //Triangle
-        "http://purl.obolibrary.org/obo/MI_0190": "Connection between molecule",    //None
-        "http://purl.obolibrary.org/obo/CHEBI_23357": "Cofactor",                   //Triangle
-        "http://purl.obolibrary.org/obo/CHEBI_25212": "Metabolite",                 //Triangle
-        "http://purl.obolibrary.org/obo/CHEBI_35224": "Effector",                   //None
-        "http://purl.obolibrary.org/obo/CHEBI_48706": "Antagonist",                 //Tee
-        "http://purl.org/obo/owl/GO#GO_0048018": "GO_0048018",                      //Triangle
-        "http://www.berkeleybop.org/ontologies/owl/GO#GO_0030547":"GO_0030547",     //Tee
-        "http://purl.obolibrary.org/obo/MI_0915": "Physical Association",           //Circle 
-        "http://purl.obolibrary.org/obo/MI_0407": "Direct Interaction",             //None 
-        "http://purl.obolibrary.org/obo/MI_0191": "Aggregation",                    //Circle
-        "http://purl.obolibrary.org/obo/MI_0914": "Association",                    //None 
-        "http://purl.obolibrary.org/obo/MI_0217": "Phosphorylation Reaction",       //Diamond 
-        "http://purl.obolibrary.org/obo/MI_0403": "Colocalization",                 //Circle 
-        "http://purl.obolibrary.org/obo/MI_0570": "Protein Cleavage",               //Square 
-        "http://purl.obolibrary.org/obo/MI_0194": "Cleavage Reaction"               //Square 
+        "http://purl.obolibrary.org/obo/CHEBI_48705": "Agonist",                   
+        "http://purl.obolibrary.org/obo/MI_0190": "Connection between molecule",  
+        "http://purl.obolibrary.org/obo/CHEBI_23357": "Cofactor",                  
+        "http://purl.obolibrary.org/obo/CHEBI_25212": "Metabolite",                
+        "http://purl.obolibrary.org/obo/CHEBI_35224": "Effector",                   
+        "http://purl.obolibrary.org/obo/CHEBI_48706": "Antagonist",                
+        "http://purl.org/obo/owl/GO#GO_0048018": "GO_0048018",                     
+        "http://www.berkeleybop.org/ontologies/owl/GO#GO_0030547":"GO_0030547",    
+        "http://purl.obolibrary.org/obo/MI_0915": "Physical Association",          
+        "http://purl.obolibrary.org/obo/MI_0407": "Direct Interaction",          
+        "http://purl.obolibrary.org/obo/MI_0191": "Aggregation",                   
+        "http://purl.obolibrary.org/obo/MI_0914": "Association",                    
+        "http://purl.obolibrary.org/obo/MI_0217": "Phosphorylation Reaction",     
+        "http://purl.obolibrary.org/obo/MI_0403": "Colocalization",               
+        "http://purl.obolibrary.org/obo/MI_0570": "Protein Cleavage",              
+        "http://purl.obolibrary.org/obo/MI_0194": "Cleavage Reaction"             
     }
-    var ugly = "#9AFE2E";
+    $scope.edgeShapes = {
+        "http://purl.obolibrary.org/obo/CHEBI_48705": "triangle",
+        "http://purl.obolibrary.org/obo/MI_0190": "none",
+        "http://purl.obolibrary.org/obo/CHEBI_23357": "triangle",
+        "http://purl.obolibrary.org/obo/CHEBI_25212": "triangle",
+        "http://purl.obolibrary.org/obo/CHEBI_35224": "none",
+        "http://purl.obolibrary.org/obo/CHEBI_48706": "tee",
+        "http://purl.org/obo/owl/GO#GO_0048018": "triangle",
+        "http://www.berkeleybop.org/ontologies/owl/GO#GO_0030547":"tee",
+        "http://purl.obolibrary.org/obo/MI_0915": "circle",
+        "http://purl.obolibrary.org/obo/MI_0407": "none",
+        "http://purl.obolibrary.org/obo/MI_0191": "circle",
+        "http://purl.obolibrary.org/obo/MI_0914": "none",
+        "http://purl.obolibrary.org/obo/MI_0217": "diamond",
+        "http://purl.obolibrary.org/obo/MI_0403": "circle",
+        "http://purl.obolibrary.org/obo/MI_0570": "square",
+        "http://purl.obolibrary.org/obo/MI_0194": "square",
+    }
     $scope.edgeColors = {
-        "http://purl.obolibrary.org/obo/CHEBI_48705":ugly,//YELLOW
+        "http://purl.obolibrary.org/obo/CHEBI_48705": "#9AFE2E",//YELLOW
         "http://purl.obolibrary.org/obo/MI_0190": "#FF0040",//purple
-        "http://purl.obolibrary.org/obo/CHEBI_23357":ugly,//YELLOW
-        "http://purl.obolibrary.org/obo/CHEBI_25212":ugly,//YELLOW
+        "http://purl.obolibrary.org/obo/CHEBI_23357": "#9AFE2E",//YELLOW
+        "http://purl.obolibrary.org/obo/CHEBI_25212": "#9AFE2E",//YELLOW
         "http://purl.obolibrary.org/obo/CHEBI_35224": "#FF0040",//purple
         "http://purl.obolibrary.org/obo/CHEBI_48706": "#C71585",//WASSALMON#FA8072 NOW PINKRED
-        "http://purl.org/obo/owl/GO#GO_0048018":ugly,//YELLOW
+        "http://purl.org/obo/owl/GO#GO_0048018": "#9AFE2E",//YELLOW
         "http://www.berkeleybop.org/ontologies/owl/GO#GO_0030547":"#C71585",//PINKRED
         "http://purl.obolibrary.org/obo/MI_0915": "#00FFFF",//aqua
         "http://purl.obolibrary.org/obo/MI_0407": "#FF0040",//purple
         "http://purl.obolibrary.org/obo/MI_0191": "#00FFFF",//aqua
         "http://purl.obolibrary.org/obo/MI_0914": "#FF0040",//purple
-        "http://purl.obolibrary.org/obo/MI_0217": "#000000",
+        "http://purl.obolibrary.org/obo/MI_0217": "#9800FF",
         "http://purl.obolibrary.org/obo/MI_0403": "#00FFFF",//aqua
         "http://purl.obolibrary.org/obo/MI_0570": "#000000",
         "http://purl.obolibrary.org/obo/MI_0194": "#000000"
@@ -385,17 +448,6 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             return "#FF7F50" //#FFFF00
         }
     };
-    // $scope.getLineColor = function (types) {
-    //     if (types['http://semanticscience.org/resource/activator']) {
-    //         return "#FFFF00"
-    //     } else if (types['http://semanticscience.org/resource/inhibitor']) {
-    //         return "#FFFF00"
-    //     } else if (types['http://semanticscience.org/resource/protein']) {
-    //         return "#FFFF00"
-    //     } else {
-    //         return "#FFFF00" //#FFFF00
-    //     }
-    // };
     $scope.getTextlineColor = function (types) {
         if (types['http://semanticscience.org/resource/activator']) {
             return "#333333"//BLUE
@@ -423,7 +475,7 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             $scope.cy.elements('edge[color="#00FFFF"]').each(function(i, ele){ 
                 ele.removeClass("hidden"); });
         } if (query.diamond === true) {
-            $scope.cy.elements('edge[color="#000000"]').each(function(i, ele){ 
+            $scope.cy.elements('edge[color="#FF2600"]').each(function(i, ele){ 
                 ele.removeClass("hidden"); });
         } if (query.square === true) {
             $scope.cy.elements('edge[color="#000000"]').each(function(i, ele){ 
@@ -473,13 +525,13 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                         id: d[$scope.ns.prov('wasDerivedFrom')][0].uri,
                         source: source.data.id,
                         target: target.data.id, 
-                        shape: 'triangle',
-                        types: (edgeTypes && !$scope.edgeTypes[edgeTypes[0].uri]) ? 'Undefined' : $scope.edgeTypes[edgeTypes[0].uri],
+                        shape: edgeTypes ? $scope.edgeShapes[edgeTypes[0].uri] : 'none',
+                        types: (edgeTypes && !$scope.edgeTypes[edgeTypes[0].uri]) ? 'Interaction with Disease' : $scope.edgeTypes[edgeTypes[0].uri],
                         color: edgeTypes ? $scope.edgeColors[edgeTypes[0].uri] : 'none',
                         probability: d[$scope.ns.sio('probability-value')][0],
-                        likelihood: d[$scope.ns.sio('likelihood')][0],
+                        likelihood: d[$scope.ns.sio('likelihood')][0],  // z-score-value
                         lineStyle: lineStyle,
-                        width: (d[$scope.ns.sio('likelihood')][0] * 5) + 1,
+                        width: (d[$scope.ns.sio('likelihood')][0] * 4) + 1,
                         resource: d
                     })
                 };
@@ -551,11 +603,42 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         })
     });
 
+    $("#bg-dark").click(function() {
+        $('body').css("background", 'url("../img/congruent_outline.png")');
+    });
+    $("#bg-light").click(function() {
+        $('body').css("background", '#FFFFFF');
+    });
+
     $('.help').mouseover(function(){
-      $('.help-info').show();
+        $('.help-info').show();
     });
 
     $('.help').mouseleave(function(){
-      $('.help-info').hide();
+        $('.help-info').hide();
+    });
+
+    $('#random-bfs').click(function() {
+        var found = false;
+        $scope.cy.nodes().each(function(i, ele){
+            if (!i) {
+                var root = "#" + ele.id();
+                var bfs = cy.elements().bfs(root, function(){}, true);
+                if (bfs.path.length > 1) {
+                    var i = 0;
+                    var highlightNextEle = function(){
+                      bfs.path[i].addClass('highlighted');
+                      bfs.path[i].removeClass('faded');
+                      
+                      if( i < bfs.path.length - 1){
+                        i++;
+                        setTimeout(highlightNextEle, 100);
+                      }
+                    };
+                    highlightNextEle();
+                    found = true;
+                }
+            }
+        });
     });
 })

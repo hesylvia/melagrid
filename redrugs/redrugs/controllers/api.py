@@ -329,6 +329,8 @@ class TextSearchService(sadi.Service):
             answer = o.graph.resource(a[1])
             answer.add(rdflib.RDFS.label, rdflib.Literal(rdflib.Literal(a[0])))
             answer.add(pml.answers,o.identifier)
+        if len(answers) == 0:
+            answers = ["No Matches Found"];
 
     @lru
     def get_matches(self,search):

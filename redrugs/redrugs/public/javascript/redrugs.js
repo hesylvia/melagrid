@@ -17,210 +17,166 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         none: true,
         other: true
     };
-    $scope.resources = {};
-    $scope.searchTerms = "";
-    $scope.searchTermURIs = {};
-    $scope.showLabel = true;
-    $scope.getNode = function(res) {
-        var node = $scope.nodeMap[res.uri];
-        if (!node) {
-            node = $scope.nodeMap[res.uri] = {
-                group: "nodes",
-                data: {
-                    uri: res.uri,
-                    // id: res.uri,
-                    types: {},
-                    resource: res
-                }
-            };
-            // Remove all non-alphanumerical and replace space and underscore with hypen
-            node.data.id = res[$scope.ns.rdfs('label')][0].replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-');
-            node.data.label = res[$scope.ns.rdfs('label')];
-            if (res[$scope.ns.rdf('type')]) res[$scope.ns.rdf('type')].forEach(function(d) {
-                node.data.types[d.uri] = true;
-            })
-            node.data.shape = $scope.getShape(node.data.types);
-            node.data.size = $scope.getSize(node.data.types);
-            node.data.color = $scope.getColor(node.data.types);
-            // node.data.linecolor = $scope.getLineColor(node.data.types);
-            node.data.linecolor = "#FFFF00";
-            node.data.textlinecolor = $scope.getTextlineColor(node.data.types);
-        }
-        return node;
-    }
     $scope.layout = {
         name: 'arbor',
         padding: [100,100,100,100]
     }
+    $scope.resources = {};
+    $scope.searchTerms = "";
+    $scope.searchTermURIs = {};
+    $scope.showLabel = true;
 
     $scope.container = $('#results');
-    $scope.container.cytoscape({
-        style: cytoscape.stylesheet()
-            .selector('node')
-            .css({
-                'min-zoomed-font-size': 8,
-                'content': 'data(label)',
-                'text-valign': 'center',
-                'color':'white',
-                'background-color': 'data(color)',
-                'shape': 'data(shape)',
-                'text-outline-width': 2,
-                'text-outline-color': 'data(textlinecolor)',
-                'border-color': 'data(linecolor)',
-                'border-width': 2,
-                'height': 'data(size)',
-                'width': 'data(size)',
-                'cursor': 'pointer'
-            })
-            .selector('edge')
-            .css({
-                'opacity':'data(probability)',
-                'width':'data(width)',
-                'line-style': 'data(lineStyle)',
-                'target-arrow-shape': 'data(shape)',
-                'target-arrow-color': 'data(color)',
-                'line-color': 'data(color)'
-            })
-            .selector(':selected')
-            .css({
-                'background-color': '#D8D8D8',
-                'line-color': '#D8D8D8',
-                'target-arrow-color': '#D8D8D8',
-                'source-arrow-color': '#D8D8D8',
-                'opacity':1,
-            })
-            .selector('.highlighted')
-            .css({
-                'background-color': '#000000',
-                'line-color': '#000000',
-                'target-arrow-color': '#000000',
-                'transition-property': 'background-color, line-color, target-arrow-color, height, width',
-                'transition-duration': '0.5s'
-            })
-            .selector('.hidden')
-            .css({
-                'opacity': 0,
-            })
-            .selector('.faded')
-            .css({
-                'opacity': 0.25,
-                'text-opacity': 0
-            })
-            .selector('.hideLabel')
-            .css({
-                'text-opacity': 0
-            }),
+    $scope.result = $("#result");
+    $scope.createGraph = function() {
+        $scope.container.cytoscape({
+            style: cytoscape.stylesheet()
+                .selector('node')
+                .css({
+                    'min-zoomed-font-size': 8,
+                    'content': 'data(label)',
+                    'text-valign': 'center',
+                    'color':'white',
+                    'background-color': 'data(color)',
+                    'shape': 'data(shape)',
+                    'text-outline-width': 2,
+                    'text-outline-color': 'data(textlinecolor)',
+                    'border-color': 'data(linecolor)',
+                    'border-width': 2,
+                    'height': 'data(size)',
+                    'width': 'data(size)',
+                    'cursor': 'pointer'
+                })
+                .selector('edge')
+                .css({
+                    'opacity':'data(probability)',
+                    'width':'data(width)',
+                    'line-style': 'data(lineStyle)',
+                    'target-arrow-shape': 'data(shape)',
+                    'target-arrow-color': 'data(color)',
+                    'line-color': 'data(color)'
+                })
+                .selector(':selected')
+                .css({
+                    'background-color': '#D8D8D8',
+                    'line-color': '#D8D8D8',
+                    'target-arrow-color': '#D8D8D8',
+                    'source-arrow-color': '#D8D8D8',
+                    'opacity':1,
+                })
+                .selector('.highlighted')
+                .css({
+                    'background-color': '#000000',
+                    'line-color': '#000000',
+                    'target-arrow-color': '#000000',
+                    'transition-property': 'background-color, line-color, target-arrow-color, height, width',
+                    'transition-duration': '0.5s'
+                })
+                .selector('.hidden')
+                .css({
+                    'opacity': 0,
+                })
+                .selector('.faded')
+                .css({
+                    'opacity': 0.25,
+                    'text-opacity': 0
+                })
+                .selector('.hideLabel')
+                .css({
+                    'text-opacity': 0
+                }),
 
-        elements: [] ,
+            elements: [] ,
 
-        hideLabelsOnViewport: true ,
+            hideLabelsOnViewport: true ,
 
-        ready: function(){
-            $scope.cy = cy = this;
-            // giddy up...
-            // console.log(cy.elements());
-            cy.boxSelectionEnabled(false);
+            ready: function(){
+                $scope.cy = cy = this;
+                cy.boxSelectionEnabled(false);
 
-            cy.on('drag', function(e) {
-                $("#button-box").addClass('hidden');
-                $("#edge-info").addClass('hidden');
-            });
-            cy.on('pan', function(e) {
-                $("#button-box").addClass('hidden');
-                $("#edge-info").addClass('hidden');
-            });
-            cy.on('zoom', function(e) {
-                $("#button-box").addClass('hidden');
-                $("#edge-info").addClass('hidden');
-            });
+                // Hides dynamically revealed objects on page
+                cy.on('drag', function(e) {
+                    $("#button-box").addClass('hidden');
+                    $("#edge-info").addClass('hidden');
+                });
+                cy.on('pan', function(e) {
+                    $("#button-box").addClass('hidden');
+                    $("#edge-info").addClass('hidden');
+                });
+                cy.on('zoom', function(e) {
+                    $("#button-box").addClass('hidden');
+                    $("#edge-info").addClass('hidden');
+                });
+                cy.on('tapdragover', 'node', function(e) {
+                    var node = e.cyTarget;
+                    if (!$scope.showLabel) {
+                        node.removeClass('hideLabel');
+                    }
+                });
+                cy.on('tagdragout', 'node', function(e) {
+                    var node = e.cyTarget;
+                    if (!$scope.showLabel) {
+                        node.addClass('hideLabel');
+                    }
+                });
+                cy.on('free', 'node', function(e) {
+                    var selected = $scope.cy.$('node:selected');
+                    selected.nodes().each(function(i,d) {
+                        var pos = d.renderedPosition();
+                        $("#button-box").css("left", pos.x-140);
+                        $("#button-box").css("top", pos.y-100);
+                        $("#button-box").removeClass('hidden');
+                    });
+                });
+                // Double-clicking on whitespace removes all CSS changes
+                cy.on('vclick', function(e){
+                    if( e.cyTarget === cy ){
+                        cy.elements().removeClass('faded');
+                        if (!$scope.showLabel) {
+                            cy.elements().addClass('hideLabel');
+                        }
+                        $("#button-box").addClass('hidden');
+                        $("#edge-info").addClass('hidden');
+                        cy.elements().removeClass("highlighted");
+                    }
+                });
 
-            cy.on('free', 'node', function(e) {
-                var selected = $scope.cy.$('node:selected');
-                selected.nodes().each(function(i,d) {
-                    var pos = d.renderedPosition();
+                // Double-clicking a node...
+                cy.on('select', 'node', function(e){
+                    var node = e.cyTarget; 
+                    var neighborhood = node.neighborhood().add(node);
+                    var pos = node.renderedPosition();
+                    console.log(pos);
+                    
+                    cy.elements().addClass('faded');
+                    neighborhood.removeClass('faded');
+                    if (!$scope.showLabel) {
+                        node.removeClass('hideLabel');
+                        neighborhood.removeClass('hideLabel');
+                    }
+                    
                     $("#button-box").css("left", pos.x-220);
                     $("#button-box").css("top", pos.y-60);
                     $("#button-box").removeClass('hidden');
+
+                    // console.log(cy.json());
                 });
-            });
-
-            cy.on('select', 'node', function(e){
-                var node = e.cyTarget; 
-                var neighborhood = node.neighborhood().add(node);
-                var pos = node.renderedPosition();
-                console.log(pos);
-                
-                cy.elements().addClass('faded');
-                neighborhood.removeClass('faded');
-                if (!$scope.showLabel) {
-                    node.removeClass('hideLabel');
-                    neighborhood.removeClass('hideLabel');
-                }
-                
-                $("#button-box").css("left", pos.x-220);
-                $("#button-box").css("top", pos.y-60);
-                $("#button-box").removeClass('hidden');
-
-                // console.log(cy.json());
-
-                // var root = "#" + node.id();
-                // var bfs = cy.elements().bfs(root, function(i, depth){
-                //     console.log( 'visit ' + this.id() );
-                // }, true);
-                // console.log(bfs);
-                // console.log(root);
-            
-                // var i = 0;
-                // var highlightNextEle = function(){
-                //   bfs.path[i].addClass('highlighted');
-                  
-                //   if( i < bfs.path.length - 1){
-                //     i++;
-                //     setTimeout(highlightNextEle, 100);
-                //   }
-                // };
-
-                // highlightNextEle();
-            });
-
-            cy.on('click', 'edge', function(e) {
-                var pos = e.cyRenderedPosition;
-                var edge = e.cyTarget;
-                console.log(edge.data().width); 
-                $("#edge-info").html("<p>Interaction: " + edge.data().types + "</p><p> Probability: " + edge.data().probability + "</p> Likelihood: " + edge.data().likelihood );
-                $("#edge-info").css("left", pos.x+20);
-                $("#edge-info").css("top", pos.y-10);
-                $("#edge-info").removeClass('hidden');
-                // console.log(e.cyRenderedPosition);
-                // console.log(edge.data().types);
-            });
-            
-            cy.on('vclick', function(e){
-                if( e.cyTarget === cy ){
-                    cy.elements().removeClass('faded');
-                    if (!$scope.showLabel) {
-                        cy.elements().addClass('hideLabel');
-                    }
-                    $("#button-box").addClass('hidden');
-                    $("#edge-info").addClass('hidden');
-                    cy.elements().removeClass("highlighted");
-                }
-            });
-
-            cy.on('tapdragover', 'node', function(e) {
-                var node = e.cyTarget;
-                if (!$scope.showLabel) {
-                    node.removeClass('hideLabel');
-                }
-            });
-            cy.on('tagdragout', 'node', function(e) {
-                var node = e.cyTarget;
-                if (!$scope.showLabel) {
-                    node.addClass('hideLabel');
-                }
-            });
-        }
-    });
+                // Double-clicking an edge...
+                cy.on('click', 'edge', function(e) {
+                    var pos = e.cyRenderedPosition;
+                    var edge = e.cyTarget;
+                    console.log(edge.data().width); 
+                    $("#edge-info").html("<p>Interaction: " + edge.data().types + "</p><p> Probability: " + edge.data().probability + "</p> Likelihood: " + edge.data().likelihood );
+                    $("#edge-info").css("left", pos.x+20);
+                    $("#edge-info").css("top", pos.y-10);
+                    $("#edge-info").removeClass('hidden');
+                    // console.log(e.cyRenderedPosition);
+                    // console.log(edge.data().types);
+                });
+            }
+        });
+    }
+    $scope.createGraph();
 
     $scope.graph = $.Graph();
     $scope.ns = {
@@ -238,9 +194,11 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         upstream: $.SadiService("/api/upstream"),
         downstream: $.SadiService("/api/downstream"),
     };
+
+    // Bootstrap 2 Typeahead function that calls api.py search
     $(".searchBox").typeahead({
         minLength: 3,
-        items: 10,
+        items: 20,
         updater: function(selection) {
             // console.log(selection);
             $scope.searchTerms = selection;
@@ -262,10 +220,14 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                     $scope.searchTermURIs[result] = d.uri;
                     return result;
                 })
+                if (keywords.length === 0) {
+                    keywords = ["No Matches Found"];
+                }
                 process(keywords);
             }, $scope.graph, $scope.handleError);
         } 
     });
+
     $scope.handleError = function(data,status, headers, config) {
         $scope.error = true;
         $scope.loading = false;
@@ -282,15 +244,18 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         // console.log(query);
         return query;
     }
+    // Gets the details of the selected node
     $scope.getDetails = function(query) {
         var g = new $.Graph();
         query.forEach(function(uri) {
             window.open(uri);
         });
     }
+    // Shows BFS animation starting from selected node
     $scope.showBFS = function(query) {
         var g = new $.Graph();
         query.forEach(function(id) {
+            cy.elements().removeClass("highlighted");
             var root = "#" + id;
             var bfs = cy.elements().bfs(root, function(i, depth){
                 console.log( 'visit ' + this.id() );
@@ -309,72 +274,46 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             highlightNextEle();
         });
     }
-    $scope.createResource = function(uri, graph) {
-        var entity = graph.getResource(uri,'uri');
-        entity[$scope.ns.rdf('type')] = [
-            graph.getResource($scope.ns.sio('process'),'uri'),
-            graph.getResource($scope.ns.sio('material-entity'),'uri')
-        ];
-        return entity;
-    }
-    $scope.addToGraph = function(query) {
-        $scope.loading = true;
-        $('#starting-box').css("display", "none");
-        $('#interface').removeClass("hidden");
-        $('#random-bfs').removeClass("hidden");
-        // console.log(query);
-        var g = new $.Graph();
-        $scope.createResource($scope.searchTermURIs[$.trim(query)],g);
-        // console.log(g.toJSON());
-        $scope.services.process(g,function(graph){
-            $scope.services.upstream(g,function(graph){
-                $scope.services.downstream(g,$scope.appendToGraph,$scope.graph,$scope.handleError);
-            },$scope.graph,$scope.handleError);
-        },$scope.graph,$scope.handleError);
-        // console.log("This is from addToGraph: " + JSON.stringify(g));
-    }
-    $scope.getUpstream = function(query) {
-        $scope.loading = true;
-        // console.log(query);
-        var g = new $.Graph();
-        query.forEach(function(d) {
-            $scope.createResource(d,g);
+    // Used to filter edge interaction types based on color of edge
+    $scope.filter = function(query) {
+        $scope.cy.edges().each(function(i, ele){
+            ele.addClass("hidden");
         });
-        // console.log(g.toJSON());
-        // console.log("Upstream " + JSON.stringify(g));
-        $scope.services.upstream(g,$scope.appendToGraph,$scope.graph,$scope.handleError);
+        console.log(query);
+        if (query.triangle === true) {
+            $scope.cy.elements('edge[color="#9AFE2E"]').each(function(i, ele){ 
+                ele.removeClass("hidden"); });
+        } if (query.tee === true) {
+            $scope.cy.elements('edge[color="#C71585"]').each(function(i, ele){ 
+                ele.removeClass("hidden"); });
+        } if (query.circle === true) {
+            $scope.cy.elements('edge[color="#00FFFF"]').each(function(i, ele){ 
+                ele.removeClass("hidden"); });
+        } if (query.diamond === true) {
+            $scope.cy.elements('edge[color="#FF2600"]').each(function(i, ele){ 
+                ele.removeClass("hidden"); });
+        } if (query.square === true) {
+            $scope.cy.elements('edge[color="#000000"]').each(function(i, ele){ 
+                ele.removeClass("hidden"); });
+        } if (query.none === true) {
+            $scope.cy.elements('edge[color="#FF0040"]').each(function(i, ele){ 
+                ele.removeClass("hidden"); });
+        } if (query.other === true) {
+            $scope.cy.elements('edge[color="#BABABA"]').each(function(i, ele){ 
+                ele.removeClass("hidden"); });
+        }
     }
-    $scope.getDownstream = function(query) {
-        $scope.loading = true;
-        // console.log(query);
-        var g = new $.Graph();
-        query.forEach(function(d) {
-            $scope.createResource(d,g);
-        });
-        // console.log(g.toJSON());
-        // console.log("Downstream " + JSON.stringify(g));
-        $scope.services.downstream(g,$scope.appendToGraph,$scope.graph,$scope.handleError);
-    }
-    // $scope.addToGraphU2 = function(query) {
-    //     // console.log(query);
-    //     query = query.split(",").map(function(d) {
-    //         return encodeURIComponent($scope.searchTermURIs[$.trim(d)])
-    //     }).join(",")
-    //     // console.log(query);
-    //     $http({method:'GET',url:"/api/addToGraphU2?uris="+ query})
-    //         .success($scope.appendToGraph)
-    //         .error($scope.handleError);
-    // }
 
+    // Maps edge interaction types to values for Cytoscape visualization
     $scope.edgeTypes = {
         "http://purl.obolibrary.org/obo/CHEBI_48705": "Agonist",                   
-        "http://purl.obolibrary.org/obo/MI_0190": "Connection between molecule",  
+        "http://purl.obolibrary.org/obo/MI_0190": "Molecule Connection",  
         "http://purl.obolibrary.org/obo/CHEBI_23357": "Cofactor",                  
         "http://purl.obolibrary.org/obo/CHEBI_25212": "Metabolite",                
         "http://purl.obolibrary.org/obo/CHEBI_35224": "Effector",                   
         "http://purl.obolibrary.org/obo/CHEBI_48706": "Antagonist",                
-        "http://purl.org/obo/owl/GO#GO_0048018": "GO_0048018",                     
-        "http://www.berkeleybop.org/ontologies/owl/GO#GO_0030547":"GO_0030547",    
+        "http://purl.org/obo/owl/GO#GO_0048018": "Receptor Agonist Activity",                     
+        "http://www.berkeleybop.org/ontologies/owl/GO#GO_0030547":"Receptor Inhibitor Activity",    
         "http://purl.obolibrary.org/obo/MI_0915": "Physical Association",          
         "http://purl.obolibrary.org/obo/MI_0407": "Direct Interaction",          
         "http://purl.obolibrary.org/obo/MI_0191": "Aggregation",                   
@@ -421,6 +360,7 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         "http://purl.obolibrary.org/obo/MI_0194": "#000000"
     }
 
+    // Maps node types to values for Cytoscape visualization
     $scope.getShape = function (types) {
         if (types['http://semanticscience.org/resource/activator']) {
             return "triangle"
@@ -436,7 +376,6 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         if (types['http://semanticscience.org/resource/activator'] || types['http://semanticscience.org/resource/inhibitor']) { return '70'; }
         else { return '50'; }
     };
-
     $scope.getColor = function (types) {
         if (types['http://semanticscience.org/resource/activator']) {
             return "#FFD700"//BLUE
@@ -460,35 +399,88 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         }
     };
 
-    $scope.filter = function(query) {
-        $scope.cy.edges().each(function(i, ele){
-            ele.addClass("hidden");
-        });
-        console.log(query);
-        if (query.triangle === true) {
-            $scope.cy.elements('edge[color="#9AFE2E"]').each(function(i, ele){ 
-                ele.removeClass("hidden"); });
-        } if (query.tee === true) {
-            $scope.cy.elements('edge[color="#C71585"]').each(function(i, ele){ 
-                ele.removeClass("hidden"); });
-        } if (query.circle === true) {
-            $scope.cy.elements('edge[color="#00FFFF"]').each(function(i, ele){ 
-                ele.removeClass("hidden"); });
-        } if (query.diamond === true) {
-            $scope.cy.elements('edge[color="#FF2600"]').each(function(i, ele){ 
-                ele.removeClass("hidden"); });
-        } if (query.square === true) {
-            $scope.cy.elements('edge[color="#000000"]').each(function(i, ele){ 
-                ele.removeClass("hidden"); });
-        } if (query.none === true) {
-            $scope.cy.elements('edge[color="#FF0040"]').each(function(i, ele){ 
-                ele.removeClass("hidden"); });
-        } if (query.other === true) {
-            $scope.cy.elements('edge[color="#BABABA"]').each(function(i, ele){ 
-                ele.removeClass("hidden"); });
-        }
+    // Functions to create and add values to graph
+    $scope.createResource = function(uri, graph) {
+        var entity = graph.getResource(uri,'uri');
+        entity[$scope.ns.rdf('type')] = [
+            graph.getResource($scope.ns.sio('process'),'uri'),
+            graph.getResource($scope.ns.sio('material-entity'),'uri')
+        ];
+        return entity;
     }
+    $scope.addToGraph = function(query) {
+        $scope.loading = true;
+        $('#starting-box').css("display", "none");
+        $('#interface').removeClass("hidden");
+        $('#first-bfs').removeClass("hidden");
+        // console.log(query);
+        var g = new $.Graph();
+        $scope.createResource($scope.searchTermURIs[$.trim(query)],g);
+        // console.log(g.toJSON());
+        $scope.services.process(g,function(graph){
+            $scope.services.upstream(g,function(graph){
+                $scope.services.downstream(g,$scope.appendToGraph,$scope.graph,$scope.handleError);
+            },$scope.graph,$scope.handleError);
+        },$scope.graph,$scope.handleError);
+        // console.log("This is from addToGraph: " + JSON.stringify(g));
+    }
+    $scope.getUpstream = function(query) {
+        $scope.loading = true;
+        // console.log(query);
+        var g = new $.Graph();
+        query.forEach(function(d) {
+            $scope.createResource(d,g);
+        });
+        // console.log(g.toJSON());
+        $scope.services.upstream(g,$scope.appendToGraph,$scope.graph,$scope.handleError);
+    }
+    $scope.getDownstream = function(query) {
+        $scope.loading = true;
+        // console.log(query);
+        var g = new $.Graph();
+        query.forEach(function(d) {
+            $scope.createResource(d,g);
+        });
+        // console.log(g.toJSON());
+        $scope.services.downstream(g,$scope.appendToGraph,$scope.graph,$scope.handleError);
+    }
+    // $scope.addToGraphU2 = function(query) {
+    //     // console.log(query);
+    //     query = query.split(",").map(function(d) {
+    //         return encodeURIComponent($scope.searchTermURIs[$.trim(d)])
+    //     }).join(",")
+    //     // console.log(query);
+    //     $http({method:'GET',url:"/api/addToGraphU2?uris="+ query})
+    //         .success($scope.appendToGraph)
+    //         .error($scope.handleError);
+    // }
 
+    $scope.getNode = function(res) {
+        var node = $scope.nodeMap[res.uri];
+        if (!node) {
+            node = $scope.nodeMap[res.uri] = {
+                group: "nodes",
+                data: {
+                    uri: res.uri,
+                    // id: res.uri,
+                    types: {},
+                    resource: res
+                }
+            };
+            // Remove all non-alphanumerical and replace space and underscore with hypen
+            node.data.id = res[$scope.ns.rdfs('label')][0].replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-');
+            node.data.label = res[$scope.ns.rdfs('label')];
+            if (res[$scope.ns.rdf('type')]) res[$scope.ns.rdf('type')].forEach(function(d) {
+                node.data.types[d.uri] = true;
+            })
+            node.data.shape = $scope.getShape(node.data.types);
+            node.data.size = $scope.getSize(node.data.types);
+            node.data.color = $scope.getColor(node.data.types);
+            node.data.linecolor = "#FFFF00";
+            node.data.textlinecolor = $scope.getTextlineColor(node.data.types);
+        }
+        return node;
+    }
     $scope.appendToGraph = function(result) {
         // console.log(result);
         var elements = [];
@@ -540,9 +532,7 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
             });
         $scope.cy.add(elements);
         if (!$scope.showLabel) {
-            $scope.cy.elements().each(function(i, ele){
-                ele.addClass("hideLabel");
-            });
+            $scope.cy.elements().addClass("hideLabel");
         }
         $scope.cy.layout($scope.layout);
         $scope.$apply(function(){
@@ -551,12 +541,35 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         $("#button-box").addClass('hidden');
         $scope.loaded = result.resources.length;
     };
-
-    $scope.result = $("#result");
     
-    $("#zoom-fit").click(function() {
-        $scope.cy.fit(50); 
+    // Functionality for starting-page help
+    $('.help').mouseover(function(){ $('.help-info').show(); });
+    $('.help').mouseleave(function(){ $('.help-info').hide(); });
+
+    // Toggle visibility function for top left button
+    $("#min-search").click(function() {
+        $("#max-search").toggle();
+        if($('#min-search').html() === '<i class="fa fa-chevron-circle-left"></i>') {
+            $('#min-search').html('<i class="fa fa-chevron-circle-right"></i>');
+             $('#search-box').css("width", "35px");
+             $('#search-box').css("height", "50px");        
+        }
+        else {
+            $('#min-search').html('<i class="fa fa-chevron-circle-left"></i>');
+            $('#search-box').css("width", "355px");
+            $('#search-box').css("height", "");
+        }
     });
+
+    // Starts new Cytoscape visualization instead of adding to existing
+    $(".search-btn").click(function() {
+        $scope.createGraph();
+        $scope.addToGraph($scope.searchTerms);
+    });
+
+    // Options functionality
+    // Zoom functionality
+    $("#zoom-fit").click(function() { $scope.cy.fit(50); });
     $("#zoom-in").click(function() {
         var midx = $(window).width() / 2;
         var midy = $(window).height() / 2;
@@ -576,52 +589,28 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         }
     });
 
-    $("#min-search").click(function() {
-        $("#max-search").toggle();
-        if($('#min-search').html() === '<i class="fa fa-chevron-circle-left"></i>') {
-            $('#min-search').html('<i class="fa fa-chevron-circle-right"></i>');
-             $('#search-box').css("width", "35px");
-             $('#search-box').css("height", "50px");        
-        }
-        else {
-            $('#min-search').html('<i class="fa fa-chevron-circle-left"></i>');
-            $('#search-box').css("width", "330px");
-            $('#search-box').css("height", "");
-        }
-    });
-
     $("#show-lbl").click(function() {
         $scope.showLabel = true;
-        $scope.cy.elements().each(function(i, ele){
-            ele.removeClass('hideLabel');
-        })
+        $scope.cy.elements().removeClass('hideLabel');
     });
     $("#hide-lbl").click(function() {
         $scope.showLabel = false;
-        $scope.cy.elements().each(function(i, ele){
-            ele.addClass('hideLabel');
-        })
+        $scope.cy.elements().addClass('hideLabel');
     });
 
     $("#bg-dark").click(function() {
         $('body').css("background", 'url("../img/congruent_outline.png")');
     });
     $("#bg-light").click(function() {
-        $('body').css("background", '#FFFFFF');
+        $('body').css("background", 'url("../img/dimension.png")');
     });
 
-    $('.help').mouseover(function(){
-        $('.help-info').show();
-    });
-
-    $('.help').mouseleave(function(){
-        $('.help-info').hide();
-    });
-
-    $('#random-bfs').click(function() {
+    // First BFS function
+    $('#first-bfs').click(function() {
         var found = false;
         $scope.cy.nodes().each(function(i, ele){
             if (!i) {
+                cy.elements().removeClass("highlighted");
                 var root = "#" + ele.id();
                 var bfs = cy.elements().bfs(root, function(){}, true);
                 if (bfs.path.length > 1) {

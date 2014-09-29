@@ -185,6 +185,8 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                     $("#button-box").css("left", pos.x-105);
                     $("#button-box").css("top", pos.y-90);
                     $("#button-box").removeClass('hidden');
+                    // socket.send((pos.x).toFixed(2));
+                    // socket.send((pos.y).toFixed(2));
 
                     $('#edge-info').addClass('hidden');
                     // socket.send((pos.x).toFixed(2));
@@ -634,6 +636,7 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
         // Populated with [source, target, edge] of non-disease edge interactions
         var notDiseaseEle = [];
 
+<<<<<<< HEAD
         var probOfConnection = function(source) {
             var prev = $scope.currStep - 1;
             if (prev < 0) { return 1; }
@@ -661,6 +664,19 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                     notDiseaseEle.push(elements[i]);
                     notDiseaseEle.push(elements[i+1]);
                 }
+=======
+        // Split elements in graph to disease or non-disease. Assumes all diseases are targets.
+        for (i = 1; i < elements.length; i+=3) {
+            if (elements[i].data.types['http://semanticscience.org/resource/SIO_010056']) {
+                diseaseEle.push(elements[i-1]);
+                diseaseEle.push(elements[i]);
+                diseaseEle.push(elements[i+1]);
+            }
+            else {
+                notDiseaseEle.push(elements[i-1]);
+                notDiseaseEle.push(elements[i]);
+                notDiseaseEle.push(elements[i+1]);
+>>>>>>> 9188d7adf33475f39bd3a50acaeea277653672c0
             }
         }
         // Saves the non-disease for linking further searches
@@ -736,7 +752,10 @@ redrugsApp.controller('ReDrugSCtrl', function ReDrugSCtrl($scope, $http) {
                 "Continue": function() {
                     $( this ).dialog( "close" );
                     $scope.numSearch = parseInt($('#numSearch').val(), 10);
+<<<<<<< HEAD
                     $scope.probThreshold = parseFloat($('#numProb').val());
+=======
+>>>>>>> 9188d7adf33475f39bd3a50acaeea277653672c0
                     $scope.cy.$('node:selected').nodes().each(function(i,d) {$scope.selectedEle = d.data('id');});
                     $scope.currStep = 0;
                     $scope.prevEle = new Array($scope.numSearch + 1);

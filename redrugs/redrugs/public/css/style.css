@@ -265,7 +265,6 @@ a { text-decoration: none; }
   position: relative; 
   padding: 10px;
   border-radius: 10px;
-<<<<<<< HEAD
 }
 #details-hover, #bfs-hover, #upstream-hover, #downstream-hover, #twoStep-hover { 
   display: none; 
@@ -314,54 +313,7 @@ a { text-decoration: none; }
 }
 #numSearch { width: 20px; }
 #numProb { width: 30px; }
-=======
-}
-#details-hover, #bfs-hover, #upstream-hover, #downstream-hover, #twoStep-hover { 
-  display: none; 
-  background-color: black;
-  color: white;
-  position: absolute;
-  padding: 10px;
-  border-radius: 10px;
-  z-index: 250;
-  top: -52;
-}
-#details-hover:before, #bfs-hover:before, #upstream-hover:before, #downstream-hover:before, #twoStep-hover:before {
-   content:"";
-   position: absolute;
-   width: 0;
-   height: 0;
-   border-top: 16px solid black;
-   border-left: 4px solid transparent; 
-   border-right: 10px solid transparent; 
-}
-#details-hover, #bfs-hover, #upstream-hover, #downstream-hover, #twoStep-hover { left: -21px; top: -56px; }
-#details-hover:before, #bfs-hover:before, #upstream-hover:before, #downstream-hover:before, #twoStep-hover:before { margin: 22px 0px 0px 28px; }
 
-/* 
- * Warning
- */
-.ui-widget-content { border: 0px; }
-.ui-widget-header {
-  background: #FFFFFF;
-  color: #FD0140;
-  font-size: 16px;
-  border: 0px;
-  border-bottom: 1px solid #CCC;
-}
-.ui-dialog .ui-dialog-title { margin: 0.5em 0 0.1em 0px; }
-.ui-dialog-content { font-size: 14px; }
-.ui-dialog .ui-dialog-buttonpane {
-  border-width: 0px;
-  margin-top: 0px;
-}
-.ui-dialog .ui-dialog-buttonpane button { font-size: 14px !important; }
-#numSearch { 
-  width: 20px; 
-  padding: 0 0 0 3px;
-  margin: 0;
-}
->>>>>>> 9188d7adf33475f39bd3a50acaeea277653672c0
 
 /* 
  * Edge hover information

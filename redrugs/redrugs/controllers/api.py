@@ -69,7 +69,7 @@ PREFIX sio: <http://semanticscience.org/resource/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 prefix go: <http://purl.org/obo/owl/GO#GO_>
 
-SELECT distinct ?participant ?participantLabel ?participantType ?target ?targetLabel ?interaction ?interactionType ?typeLabel ?probability ?searchEntity ?searchTerm where {
+SELECT distinct ?participant ?participantLabel ?participantType ?target ?targetType ?targetLabel ?interaction ?interactionType ?typeLabel ?probability ?searchEntity ?searchTerm where {
 {% for s in search %}\
   { let ( ?searchEntity := <${s}>)
     let ( ${position} := <${s}> ) }
@@ -99,7 +99,7 @@ PREFIX sio: <http://semanticscience.org/resource/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 prefix go: <http://purl.org/obo/owl/GO#GO_>
 
-SELECT distinct ?participant ?participantLabel ?participantType ?target ?targetLabel ?targetType ?interaction ?interactionType ?typeLabel ?probability ?searchEntity ?searchTerm where {
+SELECT distinct ?participant ?participantLabel ?participantType ?target ?targetType ?targetLabel ?targetType ?interaction ?interactionType ?typeLabel ?probability ?searchEntity ?searchTerm where {
   let ( 
     ?searchEntity :=
 {% for s in search %}\
@@ -147,12 +147,18 @@ searchRelationU = [
 
 def mergeByInteraction(edges):
     def mergeInteractions(interactions):
+        print "start: "
+        result = interactions[0]
+        result['provenance'] = []
         for i in interactions:
+            print "i: "
+            print i
             if i['probability'] == None:
                 #print i
-                i['probability'] = rdflib.Literal(0.99)
-        result = interactions[0]
+                i['probability'] = rdflib.Literal(0.99)     #Drugbank, OMIM
+            result['provenance'].append((i['interaction'], i['interactionType'], i['probability']))
         result['probability'] = geomean([i['probability'].value for i in interactions])
+        print "end: "
         return result
     
     byInteraction = collections.defaultdict(list)
@@ -201,6 +207,8 @@ class InteractionsService(sadi.Service):
             interaction.add(sio['has-participant'],participant.identifier)
             interaction.add(sio['probability-value'], rdflib.Literal(i['probability']))
             interaction.add(sio.likelihood, rdflib.Literal(i['likelihood']))
+            for t in i['provenance']:
+                interaction.add(prov.data, rdflib.Literal(t))
 
     def getOrganization(self):
         result = self.Organization()
@@ -274,35 +282,6 @@ class FindDownstreamTargetsService(InteractionsService):
     def getOutputClass(self):
         return sio.target
 
-def addToGraphFnU2(nodes):
-    edges = []
-    queriesL = []
-    for node in nodes:
-        search = (node,)
-        queries = ([
-            appendQueryTemplate.generate(Context(search=search, position=searchRelation)).render() 
-            for searchRelation in searchRelationU])
-        for qx in queries:
-          queriesL.append(qx)
-          
-    queriesT = tuple(queriesL)
-
-    for q in queriesT:
-        #print "\nQuery:"
-        #print q
-        resultSet = model.graph.query(q)
-        variables = [x.replace("?","") for x in resultSet.vars]
-        edges.extend([dict([(variables[i],x[i]) for i  in range(len(x))]) for x in resultSet])
-        print len(edges)
-    print "initial:", [edge for edge in edges if edge['participantLabel'] == "Topiramate"]
-    edges = mergeByInteraction(edges)
-    print "merge 1:", [edge for edge in edges if edge['participantLabel'] == "Topiramate"]
-    edges = mergeByInteractionType(edges)
-    print "merge 2:", [edge for edge in edges if edge['participantLabel'] == "Topiramate"]
-    print "exiting addToGraphFnU2 with number of edges: "
-    print len(edges)
-    return edges
-
 class TextSearchService(sadi.Service):
     label = "Resource Text Search"
     serviceDescriptionText = 'Look up resources using free text search against their RDFS labels. This service is optimized for typeahead user interfaces.'
@@ -329,8 +308,6 @@ class TextSearchService(sadi.Service):
             answer = o.graph.resource(a[1])
             answer.add(rdflib.RDFS.label, rdflib.Literal(rdflib.Literal(a[0])))
             answer.add(pml.answers,o.identifier)
-        if len(answers) == 0:
-            answers = ["No Matches Found"];
 
     @lru
     def get_matches(self,search):
@@ -339,7 +316,7 @@ class TextSearchService(sadi.Service):
             ?o bd:search """{0}.*""" .
             ?s rdfs:label ?o.
             FILTER(isURI(?s))
-          }}  limit 10'''.format(search))
+          }}  limit 20'''.format(search))
         result = [[y for y in x] for x in resultSet]
         return result
 

@@ -5,7 +5,7 @@ import rdflib
 import rdflib.graph
 
 #endpoints = [
-endpoint =  "http://lod.melagrid.org/bigdata/sparql"
+endpoint =  "http://redrugs.tw.rpi.edu/bigdata/sparql"
 #"http://drugbank.bio2rdf.org/sparql",
 #    ]
 #graphs = []
